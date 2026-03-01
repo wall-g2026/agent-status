@@ -6,980 +6,108 @@
   <title>WALL Team 工作状态 (8 Agents)</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Orbitron:wght@400;700;900&display=swap');
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    
-    body {
-      min-height: 100vh;
-      background: 
-        radial-gradient(ellipse at 20% 20%, rgba(120, 0, 255, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 80%, rgba(0, 200, 255, 0.15) 0%, transparent 50%),
-        linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
-      font-family: 'Noto Sans SC', sans-serif;
-      padding: 20px;
-      overflow-x: hidden;
-    }
-    
-    /* 动漫风格背景装饰 */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(255, 0, 150, 0.1) 0%, transparent 20%),
-        radial-gradient(circle at 90% 80%, rgba(0, 255, 255, 0.1) 0%, transparent 20%);
-      pointer-events: none;
-      z-index: 0;
-    }
-    
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 1;
-    }
-    
-    /* 标题 */
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-    }
-    
-    .title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.5rem;
-      font-weight: 900;
-      background: linear-gradient(90deg, #ff6b9d, #c44cff, #6bffff, #ff6b9d);
-      background-size: 300% 100%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      animation: gradientShift 3s ease infinite;
-      text-shadow: 0 0 30px rgba(196, 76, 255, 0.5);
-      letter-spacing: 4px;
-    }
-    
-    @keyframes gradientShift {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-    
-    .subtitle {
-      color: #8892b0;
-      margin-top: 10px;
-      font-size: 1rem;
-    }
-    
-    /* 时间显示 */
-    .time-display {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    
-    .time {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      color: #00ffff;
-      text-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
-    }
-    
-    .date {
-      color: #8892b0;
-      font-size: 0.9rem;
-      margin-top: 5px;
-    }
-    
-    /* Agent 卡片网格 */
-    .agents-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-      margin-bottom: 40px;
-    }
-    
-    @media (max-width: 1100px) {
-      .agents-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    
-    @media (max-width: 600px) {
-      .agents-grid { grid-template-columns: 1fr; }
-    }
-    
-    /* Agent 卡片 */
-    .agent-card {
-      background: rgba(255, 255, 255, 0.03);
-      border-radius: 20px;
-      padding: 25px;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      border: 2px solid transparent;
-    }
-    
-    .agent-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--card-color-1), var(--card-color-2));
-    }
-    
-    .agent-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    }
-    
-    .agent-card.wall-g { --card-color-1: #ff6b9d; --card-color-2: #c44cff; }
-    .agent-card.wall-c { --card-color-1: #00ffff; --card-color-2: #0099ff; }
-    .agent-card.wall-e { --card-color-1: #76ff03; --card-color-2: #00e676; }
-    .agent-card.wall-r { --card-color-1: #ffab00; --card-color-2: #ff6d00; }
-    .agent-card.wall-a { --card-color-1: #e040fb; --card-color-2: #7c4dff; }
-    .agent-card.wall-b { --card-color-1: #ff5252; --card-color-2: #ff1744; }
-    .agent-card.wall-p { --card-color-1: #40c4ff; --card-color-2: #00b0ff; }
-    .agent-card.wall-x { --card-color-1: #b388ff; --card-color-2: #8c9eff; }
-    
-    .agent-card.active {
-      border-color: var(--card-color-1);
-      box-shadow: 0 0 30px rgba(var(--card-color-1), 0.3);
-    }
-    
-    /* 动漫风格光效 */
-    .agent-card::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.4s;
-      pointer-events: none;
-    }
-    
-    .agent-card:hover::after {
-      opacity: 1;
-    }
-    
-    /* 头像 */
-    .avatar-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 15px;
-    }
-    
-    .avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.5rem;
-      position: relative;
-      animation: avatarPulse 2s ease-in-out infinite;
-    }
-    
-    @keyframes avatarPulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    
-    .agent-card.wall-g .avatar { background: linear-gradient(135deg, #ff6b9d, #c44cff); }
-    .agent-card.wall-c .avatar { background: linear-gradient(135deg, #00ffff, #0099ff); }
-    .agent-card.wall-e .avatar { background: linear-gradient(135deg, #76ff03, #00e676); }
-    .agent-card.wall-r .avatar { background: linear-gradient(135deg, #ffab00, #ff6d00); }
-    .agent-card.wall-a .avatar { background: linear-gradient(135deg, #e040fb, #7c4dff); }
-    .agent-card.wall-b .avatar { background: linear-gradient(135deg, #ff5252, #ff1744); }
-    .agent-card.wall-p .avatar { background: linear-gradient(135deg, #40c4ff, #00b0ff); }
-    .agent-card.wall-x .avatar { background: linear-gradient(135deg, #b388ff, #8c9eff); }
-    
-    /* 状态指示灯 */
-    .status-light {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #444;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
-    
-    .status-light.active {
-      background: #00ff88;
-      box-shadow: 0 0 15px #00ff88, 0 0 30px #00ff88;
-      animation: blink 1.5s ease-in-out infinite;
-    }
-    
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    
-    /* 名称 */
-    .agent-name {
-      text-align: center;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 5px;
-      color: #fff;
-    }
-    
-    .agent-role {
-      text-align: center;
-      font-size: 0.85rem;
-      color: #8892b0;
-      margin-bottom: 20px;
-    }
-    
-    /* 状态条 */
-    .status-bar {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 10px;
-    }
-    
-    .status-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    
-    .status-item:last-child {
-      margin-bottom: 0;
-    }
-    
-    .status-label {
-      color: #8892b0;
-      font-size: 0.8rem;
-    }
-    
-    .status-value {
-      color: #fff;
-      font-weight: 700;
-      font-size: 0.9rem;
-    }
-    
-    .status-value.token { color: #00ffff; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { min-height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%); font-family: 'Noto Sans SC', sans-serif; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { text-align: center; margin-bottom: 40px; }
+    .title { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: 900; background: linear-gradient(90deg, #ff6b9d, #c44cff, #6bffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: #8892b0; margin-top: 10px; }
+    .time-display { text-align: center; margin-bottom: 30px; }
+    .time { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; color: #00ffff; }
+    .date { color: #8892b0; font-size: 0.9rem; margin-top: 5px; }
+    .agents-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
+    @media (max-width: 900px) { .agents-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .agents-grid { grid-template-columns: 1fr; } }
+    .agent-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 20px; position: relative; overflow: hidden; }
+    .agent-card:hover { background: rgba(255, 255, 255, 0.06); transform: translateY(-2px); }
+    .status-light { position: absolute; top: 15px; right: 15px; width: 10px; height: 10px; border-radius: 50%; background: #ff6b9d; box-shadow: 0 0 10px #ff6b9d; }
+    .status-light.idle { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+    .avatar { font-size: 2.5rem; text-align: center; margin-bottom: 10px; }
+    .agent-name { font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 5px; }
+    .agent-role { color: #8892b0; font-size: 0.8rem; text-align: center; margin-bottom: 15px; }
+    .status-bar { display: flex; flex-direction: column; gap: 8px; }
+    .status-item { display: flex; justify-content: space-between; font-size: 0.85rem; }
+    .status-label { color: #8892b0; }
+    .status-value { color: #fff; }
     .status-value.model { color: #c44cff; }
     .status-value.session { color: #ff6b9d; }
-    
-    /* Token 进度条 */
-    .token-bar {
-      height: 6px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
-      margin-top: 10px;
-      overflow: hidden;
-    }
-    
-    .token-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: linear-gradient(90deg, #00ffff, #0099ff);
-      transition: width 0.5s ease;
-    }
-    
-    /* 技能徽章 */
-    .skills-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 15px;
-    }
-    
-    .skill-badge {
-      padding: 4px 10px;
-      border-radius: 12px;
-      font-size: 0.7rem;
-      background: rgba(255, 255, 255, 0.1);
-      color: #8892b0;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    /* 协作状态区域 */
-    .collab-area {
-      background: rgba(255, 255, 255, 0.02);
-      border-radius: 20px;
-      padding: 30px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .collab-title {
-      font-family: 'Orbitron', sans-serif;
-      text-align: center;
-      font-size: 1.2rem;
-      color: #fff;
-      margin-bottom: 25px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    .collab-title::before,
-    .collab-title::after {
-      content: '✦';
-      color: #c44cff;
-    }
-    
-    /* 连接线动画 */
-    .connections {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
-    
-    .connection-line {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .agent-node {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
-      position: relative;
-    }
-    
-    .agent-node::after {
-      content: '';
-      position: absolute;
-      inset: -3px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      background: linear-gradient(45deg, var(--node-color), transparent) border-box;
-      -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-      mask-composite: exclude;
-      animation: rotate 3s linear infinite;
-    }
-    
-    @keyframes rotate {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    
-    .agent-node.wall-g { background: linear-gradient(135deg, #ff6b9d, #c44cff); --node-color: #ff6b9d; }
-    .agent-node.wall-c { background: linear-gradient(135deg, #00ffff, #0099ff); --node-color: #00ffff; }
-    .agent-node.wall-e { background: linear-gradient(135deg, #76ff03, #00e676); --node-color: #76ff03; }
-    .agent-node.wall-r { background: linear-gradient(135deg, #ffab00, #ff6d00); --node-color: #ffab00; }
-    .agent-node.wall-a { background: linear-gradient(135deg, #e040fb, #7c4dff); --node-color: #e040fb; }
-    .agent-node.wall-b { background: linear-gradient(135deg, #ff5252, #ff1744); --node-color: #ff5252; }
-    .agent-node.wall-p { background: linear-gradient(135deg, #40c4ff, #00b0ff); --node-color: #40c4ff; }
-    .agent-node.wall-x { background: linear-gradient(135deg, #b388ff, #8c9eff); --node-color: #b388ff; }
-    
-    .connector {
-      width: 30px;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, #c44cff, transparent);
-      position: relative;
-    }
-    
-    .connector::after {
-      content: '✦';
-      position: absolute;
-      right: -5px;
-      top: -7px;
-      color: #c44cff;
-      font-size: 0.8rem;
-      animation: flowRight 1.5s ease-in-out infinite;
-    }
-    
-    @keyframes flowRight {
-      0% { opacity: 0; transform: translateX(-10px); }
-      50% { opacity: 1; }
-      100% { opacity: 0; transform: translateX(10px); }
-    }
-    
-    /* 统计信息 */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 15px;
-      margin-top: 25px;
-    }
-    
-    .stat-box {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      padding: 15px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transition: all 0.3s;
-    }
-    
-    .stat-box:hover {
-      border-color: rgba(196, 76, 255, 0.3);
-      transform: translateY(-3px);
-    }
-    
-    .stat-value {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #00ffff, #c44cff);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .stat-label {
-      color: #8892b0;
-      font-size: 0.75rem;
-      margin-top: 5px;
-    }
-    
-    /* 活动日志 */
-    .activity-log {
-      margin-top: 30px;
-    }
-    
-    .log-title {
-      font-family: 'Orbitron', sans-serif;
-      color: #fff;
-      font-size: 1rem;
-      margin-bottom: 15px;
-    }
-    
-    .log-container {
-      background: rgba(0, 0, 0, 0.3);
-      border-radius: 12px;
-      padding: 15px;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    
-    .log-entry {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      font-size: 0.85rem;
-    }
-    
-    .log-entry:last-child {
-      border-bottom: none;
-    }
-    
-    .log-time {
-      color: #8892b0;
-      font-size: 0.75rem;
-      min-width: 60px;
-    }
-    
-    .log-agent {
-      padding: 2px 8px;
-      border-radius: 6px;
-      font-size: 0.7rem;
-      font-weight: 700;
-    }
-    
-    .log-agent.wall-g { background: rgba(255, 107, 157, 0.2); color: #ff6b9d; }
-    .log-agent.wall-c { background: rgba(0, 255, 255, 0.2); color: #00ffff; }
-    .log-agent.wall-e { background: rgba(118, 255, 3, 0.2); color: #76ff03; }
-    .log-agent.wall-r { background: rgba(255, 171, 0, 0.2); color: #ffab00; }
-    .log-agent.wall-a { background: rgba(224, 64, 251, 0.2); color: #e040fb; }
-    .log-agent.wall-b { background: rgba(255, 82, 82, 0.2); color: #ff5252; }
-    .log-agent.wall-p { background: rgba(64, 196, 255, 0.2); color: #40c4ff; }
-    .log-agent.wall-x { background: rgba(179, 136, 255, 0.2); color: #b388ff; }
-    
-    .log-message {
-      color: #ccc;
-    }
-    
-    /* 滚动条 */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 3px;
-    }
-    
-    ::-webkit-scrollbar-thumb {
-      background: #c44cff;
-      border-radius: 3px;
-    }
-    
-    /* 响应式 */
-    @media (max-width: 768px) {
-      .title { font-size: 1.8rem; }
-      .stats-row { grid-template-columns: repeat(2, 1fr); }
-      .connections { flex-direction: column; }
-      .connector { transform: rotate(90deg); }
-    }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 40px; }
+    .stat-box { background: rgba(255, 255, 255, 0.03); border-radius: 12px; padding: 20px; text-align: center; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: #00ffff; }
+    .stat-label { color: #8892b0; font-size: 0.85rem; margin-top: 5px; }
+    .refresh-info { text-align: center; color: #8892b0; font-size: 0.8rem; margin-top: 20px; }
   </style>
 </head>
 <body>
   <div class="container">
-    <header class="header">
-      <h1 class="title">WALL TEAM</h1>
-      <p class="subtitle">✦ 8 Agents Collaboration Panel ✦</p>
-    </header>
-    
+    <div class="header">
+      <h1 class="title">WALL TEAM STATUS</h1>
+      <p class="subtitle">🤖 8 Agents | 本地实时监控</p>
+    </div>
     <div class="time-display">
-      <div class="time" id="clock">00:00:00</div>
+      <div class="time" id="clock">--:--:--</div>
       <div class="date" id="date">Loading...</div>
     </div>
-    
-    <div class="agents-grid">
-      <!-- WALL-G Agent -->
-      <div class="agent-card wall-g active" id="card-wall-g">
-        <div class="status-light active"></div>
-        <div class="avatar-container">
-          <div class="avatar">🦞</div>
-        </div>
-        <h2 class="agent-name">WALL-G</h2>
-        <p class="agent-role">主控 Agent</p>
-        <div class="status-bar">
-          <div class="status-item">
-            <span class="status-label">状态</span>
-            <span class="status-value">工作中</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">模型</span>
-            <span class="status-value model">Step 3.5</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Token</span>
-            <span class="status-value token">51k / 200k</span>
-          </div>
-          <div class="token-bar">
-            <div class="token-fill" style="width: 26%"></div>
-          </div>
-          <div class="status-item" style="margin-top: 8px;">
-            <span class="status-label">会话</span>
-            <span class="status-value session">18</span>
-          </div>
-        </div>
-        <div class="skills-container">
-          <span class="skill-badge">Feishu</span>
-          <span class="skill-badge">Discord</span>
-          <span class="skill-badge">Memory</span>
-        </div>
-      </div>
-      
-      <!-- WALL-C -->
-      <div class="agent-card wall-c active" id="card-wall-c">
-        <div class="status-light active"></div>
-        <div class="avatar-container">
-          <div class="avatar">💻</div>
-        </div>
-        <h2 class="agent-name">WALL-C</h2>
-        <p class="agent-role">编程助手</p>
-        <div class="status-bar">
-          <div class="status-item">
-            <span class="status-label">状态</span>
-            <span class="status-value">工作中</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">模型</span>
-            <span class="status-value model">Step 3.5</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Token</span>
-            <span class="status-value token">15k / 200k</span>
-          </div>
-          <div class="token-bar">
-            <div class="token-fill" style="width: 8%"></div>
-          </div>
-          <div class="status-item" style="margin-top: 8px;">
-            <span class="status-label">会话</span>
-            <span class="status-value session">783</span>
-          </div>
-        </div>
-        <div class="skills-container">
-          <span class="skill-badge">Feishu</span>
-          <span class="skill-badge">Coding</span>
-          <span class="skill-badge">Memory</span>
-        </div>
-      </div>
-      
-      <!-- WALL-E -->
-      <div class="agent-card wall-e" id="card-wall-e">
-        <div class="status-light"></div>
-        <div class="avatar-container">
-          <div class="avatar">🔔</div>
-        </div>
-        <h2 class="agent-name">WALL-E</h2>
-        <p class="agent-role">定时任务</p>
-        <div class="status-bar">
-          <div class="status-item">
-            <span class="status-label">状态</span>
-            <span class="status-value">空闲</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">模型</span>
-            <span class="status-value model">Step 3.5</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Token</span>
-            <span class="status-value token">61k / 200k</span>
-          </div>
-          <div class="token-bar">
-            <div class="token-fill" style="width: 31%"></div>
-          </div>
-          <div class="status-item" style="margin-top: 8px;">
-            <span class="status-label">会话</span>
-            <span class="status-value session">22</span>
-          </div>
-        </div>
-        <div class="skills-container">
-          <span class="skill-badge">Feishu</span>
-          <span class="skill-badge">Cron</span>
-        </div>
-      </div>
-      
-      <!-- WALL-R -->
-      <div class="agent-card wall-r" id="card-wall-r">
-        <div class="status-light"></div>
-        <div class="avatar-container">
-          <div class="avatar">🤖</div>
-        </div>
-        <h2 class="agent-name">WALL-R</h2>
-        <p class="agent-role">响应 Agent</p>
-        <div class="status-bar">
-          <div class="status-item">
-            <span class="status-label">状态</span>
-            <span class="status-value">空闲</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">模型</span>
-            <span class="status-value model">Step 3.5</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Token</span>
-            <span class="status-value token">15k / 200k</span>
-          </div>
-          <div class="token-bar">
-            <div class="token-fill" style="width: 8%"></div>
-          </div>
-          <div class="status-item" style="margin-top: 8px;">
-            <span class="status-label">会话</span>
-            <span class="status-value session">3</span>
-          </div>
-        </div>
-        <div class="skills-container">
-          <span class="skill-badge">Feishu</span>
-          <span class="skill-badge">Response</span>
-        </div>
-      </div>
-      
-      <!-- WALL-A -->
-      <div class="agent-card wall-a" id="card-wall-a">
-        <div class="status-light"></div>
-        <div class="avatar-container">
-          <div class="avatar">🟣</div>
-        </div>
-        <h2 class="agent-name">WALL-A</h2>
-        <p class="agent-role">Agent A</p>
-        <div class="status-bar">
-          <div class="status-item">
-            <span class="status-label">状态</span>
-            <span class="status-value">空闲</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">模型</span>
-            <span class="status-value model">Step 3.5</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Token</span>
-            <span class="status-value token">5k / 200k</span>
-          </div>
-          <div class="token-bar">
-            <div class="token-fill" style="width: 3%"></div>
-          </div>
-          <div class="status-item" style="margin-top: 8px;">
-            <span class="status-label">会话</span>
-            <span class="status-value session">1</span>
-          </div>
-        </div>
-        <div class="skills-container">
-          <span class="skill-badge">Feishu</span>
-        </div>
-      </div>
-      
-      <!-- WALL-B -->
-      <div class="agent-card wall-b" id="card-wall-b">
-        <div class="status-light"></div>
-        <div class="avatar-container">
-          <div class="avatar">🔴</div>
-        </div>
-        <h2 class="agent-name">WALL-B</h2>
-        <p class="agent-role">Agent B</p>
-        <div class="status-bar">
-          <div class="status-item">
-            <span class="status-label">状态</span>
-            <span class="status-value">空闲</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">模型</span>
-            <span class="status-value model">Step 3.5</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Token</span>
-            <span class="status-value token">8k / 200k</span>
-          </div>
-          <div class="token-bar">
-            <div class="token-fill" style="width: 4%"></div>
-          </div>
-          <div class="status-item" style="margin-top: 8px;">
-            <span class="status-label">会话</span>
-            <span class="status-value session">3</span>
-          </div>
-        </div>
-        <div class="skills-container">
-          <span class="skill-badge">Feishu</span>
-        </div>
-      </div>
-      
-      <!-- WALL-P -->
-      <div class="agent-card wall-p" id="card-wall-p">
-        <div class="status-light"></div>
-        <div class="avatar-container">
-          <div class="avatar">🔵</div>
-        </div>
-        <h2 class="agent-name">WALL-P</h2>
-        <p class="agent-role">Agent P</p>
-        <div class="status-bar">
-          <div class="status-item">
-            <span class="status-label">状态</span>
-            <span class="status-value">空闲</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">模型</span>
-            <span class="status-value model">Step 3.5</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Token</span>
-            <span class="status-value token">3k / 200k</span>
-          </div>
-          <div class="token-bar">
-            <div class="token-fill" style="width: 2%"></div>
-          </div>
-          <div class="status-item" style="margin-top: 8px;">
-            <span class="status-label">会话</span>
-            <span class="status-value session">1</span>
-          </div>
-        </div>
-        <div class="skills-container">
-          <span class="skill-badge">Feishu</span>
-        </div>
-      </div>
-      
-      <!-- WALL-X -->
-      <div class="agent-card wall-x" id="card-wall-x">
-        <div class="status-light"></div>
-        <div class="avatar-container">
-          <div class="avatar">🟡</div>
-        </div>
-        <h2 class="agent-name">WALL-X</h2>
-        <p class="agent-role">Agent X</p>
-        <div class="status-bar">
-          <div class="status-item">
-            <span class="status-label">状态</span>
-            <span class="status-value">空闲</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">模型</span>
-            <span class="status-value model">Step 3.5</span>
-          </div>
-          <div class="status-item">
-            <span class="status-label">Token</span>
-            <span class="status-value token">12k / 200k</span>
-          </div>
-          <div class="token-bar">
-            <div class="token-fill" style="width: 6%"></div>
-          </div>
-          <div class="status-item" style="margin-top: 8px;">
-            <span class="status-label">会话</span>
-            <span class="status-value session">1</span>
-          </div>
-        </div>
-        <div class="skills-container">
-          <span class="skill-badge">Feishu</span>
-        </div>
-      </div>
-    </div>
-    
-    <!-- 协作区域 -->
-    <div class="collab-area">
-      <h3 class="collab-title">协作网络</h3>
-      <div class="connections">
-        <div class="connection-line">
-          <div class="agent-node wall-g">🦞</div>
-          <div class="connector"></div>
-        </div>
-        <div class="connection-line">
-          <div class="agent-node wall-c">💻</div>
-          <div class="connector"></div>
-        </div>
-        <div class="connection-line">
-          <div class="agent-node wall-e">🔔</div>
-          <div class="connector"></div>
-        </div>
-        <div class="connection-line">
-          <div class="agent-node wall-r">🤖</div>
-          <div class="connector"></div>
-        </div>
-        <div class="connection-line">
-          <div class="agent-node wall-a">🟣</div>
-          <div class="connector"></div>
-        </div>
-        <div class="connection-line">
-          <div class="agent-node wall-b">🔴</div>
-          <div class="connector"></div>
-        </div>
-        <div class="connection-line">
-          <div class="agent-node wall-p">🔵</div>
-          <div class="connector"></div>
-        </div>
-        <div class="agent-node wall-x">🟡</div>
-      </div>
-      
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-value">834</div>
-          <div class="stat-label">总会话数</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value">8</div>
-          <div class="stat-label">在线 Agent</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value">200k</div>
-          <div class="stat-label">上下文上限</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-value">79%</div>
-          <div class="stat-label">缓存命中率</div>
-        </div>
-      </div>
-      
-      <div class="activity-log">
-        <h4 class="log-title">📋 最近活动</h4>
-        <div class="log-container" id="log-container">
-          <div class="log-entry">
-            <span class="log-time">14:59</span>
-            <span class="log-agent wall-c">WALL-C</span>
-            <span class="log-message">权限验证完成</span>
-          </div>
-          <div class="log-entry">
-            <span class="log-time">14:37</span>
-            <span class="log-agent wall-c">WALL-C</span>
-            <span class="log-message">回复 Token 用量查询</span>
-          </div>
-          <div class="log-entry">
-            <span class="log-time">13:45</span>
-            <span class="log-agent wall-g">WALL-G</span>
-            <span class="log-message">创建运维档案</span>
-          </div>
-          <div class="log-entry">
-            <span class="log-time">13:45</span>
-            <span class="log-agent wall-c">WALL-C</span>
-            <span class="log-message">响应测试消息</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="agents-grid" id="agents-grid">Loading...</div>
+    <div class="stats-row" id="stats-row"></div>
+    <div class="refresh-info" id="refresh-info">自动刷新中...</div>
   </div>
-  
   <script>
-    // 时钟更新
-    function updateClock() {
-      const now = new Date();
-      const time = now.toLocaleTimeString('zh-CN', { hour12: false });
-      const date = now.toLocaleDateString('zh-CN', { 
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      });
-      document.getElementById('clock').textContent = time;
-      document.getElementById('date').textContent = date;
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
+    let statusData = {"wall-g":{"name":"WALL-G","model":"MiniMax M2.1","sessions":18,"status":"忙碌"},"wall-c":{"name":"WALL-C","model":"MiniMax M2.1","sessions":783,"status":"忙碌"},"wall-e":{"name":"WALL-E","model":"MiniMax M2.1","sessions":22,"status":"忙碌"},"wall-r":{"name":"WALL-R","model":"MiniMax M2.1","sessions":3,"status":"忙碌"},"wall-a":{"name":"WALL-A","model":"MiniMax M2.1","sessions":1,"status":"忙碌"},"wall-b":{"name":"WALL-B","model":"MiniMax M2.1","sessions":2,"status":"忙碌"},"wall-p":{"name":"WALL-P","model":"MiniMax M2.1","sessions":1,"status":"忙碌"},"wall-x":{"name":"WALL-X","model":"Step 3.5","sessions":4,"status":"忙碌"}};
     
-    // 模拟活动日志更新
-    const activities = [
-      { agent: 'wall-c', message: '处理用户请求中...' },
-      { agent: 'wall-g', message: '会话状态更新' },
-      { agent: 'wall-e', message: '检查定时任务' },
-      { agent: 'wall-r', message: '等待触发' },
-      { agent: 'wall-a', message: '初始化中...' },
-      { agent: 'wall-b', message: '处理任务' },
-      { agent: 'wall-p', message: '待命中' },
-      { agent: 'wall-x', message: '响应请求' },
-    ];
-    
-    let logIndex = 0;
-    function addLogEntry() {
-      const container = document.getElementById('log-container');
-      const now = new Date();
-      const time = now.toTimeString().slice(0, 5);
-      const activity = activities[logIndex % activities.length];
+    function render() {
+      const grid = document.getElementById('agents-grid');
+      const stats = document.getElementById('stats-row');
       
-      const entry = document.createElement('div');
-      entry.className = 'log-entry';
-      entry.innerHTML = `
-        <span class="log-time">${time}</span>
-        <span class="log-agent ${activity.agent}">${activity.agent.toUpperCase().replace('-', '-')}</span>
-        <span class="log-message">${activity.message}</span>
-      `;
+      let html = '';
+      let totalSessions = 0;
+      let busyCount = 0;
       
-      container.insertBefore(entry, container.firstChild);
-      
-      // 保持最多10条
-      if (container.children.length > 10) {
-        container.removeChild(container.lastChild);
+      for (const [key, agent] of Object.entries(statusData)) {
+        totalSessions += agent.sessions;
+        if (agent.status === '忙碌') busyCount++;
+        
+        html += `<div class="agent-card ${key}">
+          <div class="status-light ${agent.status === '空闲' ? 'idle' : ''}"></div>
+          <div class="avatar">${agent.status === '空闲' ? '🟢' : '🔵'}</div>
+          <h2 class="agent-name">${agent.name}</h2>
+          <p class="agent-role">Agent ${key.replace('wall-', '').toUpperCase()}</p>
+          <div class="status-bar">
+            <div class="status-item"><span class="status-label">状态</span><span class="status-value">${agent.status}</span></div>
+            <div class="status-item"><span class="status-label">模型</span><span class="status-value model">${agent.model}</span></div>
+            <div class="status-item"><span class="status-label">会话</span><span class="status-value session">${agent.sessions}</span></div>
+          </div>
+        </div>`;
       }
       
-      logIndex++;
+      grid.innerHTML = html;
+      stats.innerHTML = `<div class="stat-box"><div class="stat-value">${totalSessions}</div><div class="stat-label">总会话数</div></div>
+        <div class="stat-box"><div class="stat-value">${busyCount}</div><div class="stat-label">忙碌Agent</div></div>
+        <div class="stat-box"><div class="stat-value">${8 - busyCount}</div><div class="stat-label">空闲Agent</div></div>
+        <div class="stat-box"><div class="stat-value">8</div><div class="stat-label">总Agent数</div></div>`;
     }
     
-    // 每10秒添加一条日志
-    setInterval(addLogEntry, 10000);
-    
-    // 随机状态变化动画
-    function randomStatusChange() {
-      const cards = ['card-wall-g', 'card-wall-c', 'card-wall-e', 'card-wall-r', 'card-wall-a', 'card-wall-b', 'card-wall-p', 'card-wall-x'];
-      const randomCard = cards[Math.floor(Math.random() * cards.length)];
-      const card = document.getElementById(randomCard);
-      const light = card.querySelector('.status-light');
-      
-      light.classList.add('active');
-      setTimeout(() => {
-        if (Math.random() > 0.5) {
-          light.classList.remove('active');
-        }
-      }, 2000);
+    function updateClock() {
+      const now = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour12: false });
+      const [date, time] = now.split(' ');
+      document.getElementById('clock').textContent = time;
+      document.getElementById('date').textContent = date;
+      document.getElementById('refresh-info').textContent = '最后更新: ' + now;
     }
     
-    setInterval(randomStatusChange, 3000);
+    async function refresh() {
+      try {
+        const res = await fetch('/api/status');
+        statusData = await res.json();
+        render();
+      } catch (e) {
+        console.log('Refresh failed:', e);
+      }
+    }
+    
+    render();
+    updateClock();
+    setInterval(() => { refresh(); updateClock(); }, 10000);
   </script>
 </body>
 </html>
