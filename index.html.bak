@@ -145,8 +145,7 @@
     <div>
       <div class="title">✦ WALL TEAM MONITOR ✦</div>
       <div class="subtitle">REAL-TIME CYBERPUNK DASHBOARD V2.0</div>
-    <button id="settings-btn" style="background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);padding:8px 12px;cursor:pointer;font-family:'Orbitron',monospace;border-radius:4px;" onclick="openSettings()">⚙️</button>
-  </div>
+    </div>
     <div style="text-align: right;">
       <div style="color: var(--neon-cyan); font-size: 0.8rem;" id="clock">00:00:00</div>
       <div style="color: #666; font-size: 0.7rem;" id="date">2026-03-01</div>
@@ -186,11 +185,6 @@
       </div>
 
       <div class="panel-box">
-        <div class="panel-title">🔥 24H LOAD HEATMAP</div>
-        <canvas class="heatmap-canvas" id="heatmap" width="260" height="120" style="width:100%;height:120px;background:rgba(0,0,0,0.3);border:1px solid rgba(0,255,255,0.2);border-radius:4px;"></canvas>
-      </div>
-
-      <div class="panel-box">
         <div class="panel-title">📋 ACTIVITY LOG</div>
         <div class="log-container" id="log-container"></div>
       </div>
@@ -227,7 +221,6 @@
     const ALERT_THRESHOLD = 80; // token usage % to trigger alert
     
     let agents = {};
-    let systemData = {};
     let topologyAnimation;
     let alertSound = null;
 
@@ -238,10 +231,9 @@
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         
-        // Use agents from API directly, preserve all fields
-        const agentsData = data.agents || {};
+        // Transform API data to our format
         const transformed = {};
-        for (const [key, agent] of Object.entries(agentsData)) {
+        for (const [key, agent] of Object.entries(data)) {
           transformed[key] = {
             name: agent.name,
             emoji: agent.emoji || '🤖',
@@ -250,25 +242,15 @@
             tokens: agent.tokens || 0,
             tokenLimit: agent.tokenLimit || 200000,
             tokenPercent: agent.tokenPercent || Math.round((agent.tokens || 0) / (agent.tokenLimit || 200000) * 100),
-            cpu: agent.cpu || Math.floor(Math.random() * 30) + 5,
-            mem: agent.mem || (Math.random() * 4 + 1).toFixed(1),
-            net: agent.net || { down: (Math.random() * 5).toFixed(1), up: (Math.random() * 2).toFixed(1) },
-            skills: agent.skills || [],
-            tokenHistory: agent.tokenHistory || [],
-            lastSeen: agent.lastSeen || null
+            cpu: Math.floor(Math.random() * 30) + 5, // Placeholder - would come from system metrics
+            mem: (Math.random() * 4 + 1).toFixed(1),
+            net: { down: (Math.random() * 5).toFixed(1), up: (Math.random() * 2).toFixed(1) },
+            skills: agent.skills || []
           };
         }
         agents = transformed;
-        systemData = data.system || {};
         renderAgents();
         updateSystemBar();
-        checkAlerts();
-        const avgHourly = Object.values(agents).reduce((arr, a) => {
-          if (!arr.length) arr = a.hourlyLoad || [];
-          else arr = arr.map((v,i) => v + (a.hourlyLoad?.[i] || 0));
-          return arr;
-        }, []).map(v => Object.keys(agents).length > 0 ? Math.round(v / Object.keys(agents).length) : 0);
-        drawHeatmap(avgHourly);
         checkAlerts();
         addLog('System', 'Data refreshed from API');
       } catch (e) {
@@ -309,19 +291,18 @@
     }
 
     function updateSystemBar() {
-      // Use system-wide metrics from API if available
-      const cpu = systemData.cpu || Math.round(Object.values(agents).reduce((sum, a) => sum + (a.cpu || 0), 0) / Math.max(1, Object.keys(agents).length));
-      const mem = (systemData.memory?.percent || Math.round(Object.values(agents).reduce((sum, a) => sum + parseFloat(a.mem || 0), 0) / Math.max(1, Object.keys(agents).length)));
-      const netRx = systemData.network?.rx || (Math.random()*10).toFixed(1);
-      const netTx = systemData.network?.tx || (Math.random()*5).toFixed(1);
-      const disk = systemData.disk?.percent || 68;
+      // Simulated system-wide metrics (would be from real system monitoring)
+      const totalCpu = Object.values(agents).reduce((sum, a) => sum + a.cpu, 0);
+      const avgCpu = Math.round(totalCpu / Object.keys(agents).length);
+      const totalMem = Object.values(agents).reduce((sum, a) => sum + parseFloat(a.mem), 0);
+      const avgMem = (totalMem / Object.keys(agents).length).toFixed(1);
       
-      document.getElementById('sys-cpu').textContent = cpu + '%';
-      document.getElementById('cpu-bar').style.width = cpu + '%';
-      document.getElementById('sys-mem').textContent = mem + '%';
-      document.getElementById('mem-bar').style.width = Math.min(100, mem) + '%';
-      document.getElementById('sys-net').textContent = `↓${netRx} ↑${netTx} MB/s`;
-      document.getElementById('sys-disk').textContent = disk + '%';
+      document.getElementById('sys-cpu').textContent = avgCpu + '%';
+      document.getElementById('cpu-bar').style.width = avgCpu + '%';
+      document.getElementById('sys-mem').textContent = avgMem + 'GB';
+      document.getElementById('mem-bar').style.width = Math.min(100, (avgMem / 16) * 100) + '%';
+      document.getElementById('sys-net').textContent = `↓${(Math.random()*10).toFixed(1)} ↑${(Math.random()*5).toFixed(1)} MB/s`;
+      document.getElementById('sys-disk').textContent = '68%'; // placeholder
     }
 
     function checkAlerts() {
@@ -435,19 +416,8 @@
     function openModal(agentKey) {
       const agent = agents[agentKey];
       document.getElementById('modal-title').textContent = `${agent.emoji} ${agent.name} DETAIL`;
-      const tokenData = agent.tokenHistory && agent.tokenHistory.length > 0 
-        ? agent.tokenHistory.map(t => Math.round((t / agent.tokenLimit) * 100))
-        : [10,25,18,30,45,60,55,70,65,80,75,90];
-      const sessionData = agent.tokenHistory && agent.tokenHistory.length > 0
-        ? agent.tokenHistory.map(t => Math.round((t / agent.tokenLimit) * 60 + 20))
-        : [15,18,22,19,25,30,28,35,32,40,38,45];
-      const resourceData = agent.tokenHistory && agent.tokenHistory.length > 0
-        ? agent.tokenHistory.map(t => Math.round((t / agent.tokenLimit) * 70 + 15))
-        : [30,45,40,60,50,70,65,80,75,90,85,95];
-      drawLineChart('chart-token', tokenData, '#00ffff');
-      drawLineChart('chart-session', sessionData, '#ff00ff');
-      drawLineChart('chart-resource', resourceData, '#ffaa00');
-      addLog('UI', `Opened detail for ${agent.name} - history:${agent.tokenHistory?.length || 0}`);
+      initCharts();
+      addLog('UI', `Opened detail for ${agent.name}`);
       document.getElementById('agent-modal').classList.add('active');
     }
 
@@ -456,70 +426,6 @@
     }
 
     // Clock
-    // Heatmap
-    function drawHeatmap(data) {
-      const canvas = document.getElementById("heatmap");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      const w = canvas.width = canvas.offsetWidth;
-      const h = canvas.height = canvas.offsetHeight;
-      ctx.clearRect(0,0,w,h);
-      const cellW = w / 24;
-      const cellH = h / 1;
-      data.forEach((val, i) => {
-        let color;
-        if (val < 50) color = "rgba(0,255,136," + (0.3 + val/100) + ")";
-        else if (val < 80) color = "rgba(255,170,0," + (0.3 + (val-50)/100) + ")";
-        else color = "rgba(255,9,83," + (0.3 + (val-80)/100) + ")";
-        ctx.fillStyle = color;
-        ctx.fillRect(i*cellW, 0, cellW-1, h);
-      });
-      ctx.fillStyle = "var(--neon-cyan)";
-      ctx.font = "10px JetBrains Mono";
-      ctx.textAlign = "center";
-      for (let i = 0; i < 24; i++) {
-        ctx.fillText(i+"h", i*cellW + cellW/2, h - 4);
-      }
-    }
-
-    // Settings
-    let ALERT_THRESHOLD = 80;
-    let REFRESH_INTERVAL = 10;
-    let SOUND_ENABLED = false;
-
-    function openSettings() {
-      document.getElementById("settings-modal").classList.add("active");
-      document.getElementById("alert-threshold").value = ALERT_THRESHOLD;
-      document.getElementById("refresh-interval").value = REFRESH_INTERVAL;
-      document.getElementById("sound-alert").checked = SOUND_ENABLED;
-    }
-
-    function closeSettings() {
-      document.getElementById("settings-modal").classList.remove("active");
-    }
-
-    function saveSettings() {
-      ALERT_THRESHOLD = parseInt(document.getElementById("alert-threshold").value) || 80;
-      REFRESH_INTERVAL = parseInt(document.getElementById("refresh-interval").value) || 10;
-      SOUND_ENABLED = document.getElementById("sound-alert").checked;
-      localStorage.setItem("dashboardSettings", JSON.stringify({ ALERT_THRESHOLD, REFRESH_INTERVAL, SOUND_ENABLED }));
-      closeSettings();
-      addLog("Settings", `Saved: threshold=${ALERT_THRESHOLD}, interval=${REFRESH_INTERVAL}s`);
-      clearInterval(refreshTimer);
-      refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
-    }
-
-    (function loadSettings() {
-      try {
-        const saved = JSON.parse(localStorage.getItem("dashboardSettings") || "{}");
-        if (saved.ALERT_THRESHOLD) ALERT_THRESHOLD = saved.ALERT_THRESHOLD;
-        if (saved.REFRESH_INTERVAL) REFRESH_INTERVAL = saved.REFRESH_INTERVAL;
-        if (saved.SOUND_ENABLED !== undefined) SOUND_ENABLED = saved.SOUND_ENABLED;
-      } catch (e) {}
-    })();
-
-    let refreshTimer;
-
     function updateClock() {
       const now = new Date();
       document.getElementById('clock').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
@@ -531,44 +437,12 @@
       fetchStatus();
       updateClock();
       setInterval(updateClock, 1000);
-      refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
+      setInterval(fetchStatus, 10000);
       setInterval(drawTopology, 5000);
       drawTopology();
     }
 
     window.onload = init;
   </script>
-
-  <!-- Settings Modal -->
-  <div class="modal" id="settings-modal">
-    <div class="modal-content" style="max-width:500px;">
-      <div class="modal-close" onclick="closeSettings()">&times;</div>
-      <div class="modal-header">
-        <div class="modal-title">⚙️ SETTINGS</div>
-        <button class="close-btn" onclick="closeSettings()">CLOSE</button>
-      </div>
-      <div class="modal-body" style="display:block;">
-        <div style="margin-bottom:20px;">
-          <label style="display:flex;justify-content:space-between;color:var(--neon-cyan);margin-bottom:8px;">
-            <span>ALERT THRESHOLD (%)</span>
-            <input type="number" id="alert-threshold" value="80" min="1" max="100" style="width:60px;background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);padding:4px;text-align:center;">
-          </label>
-        </div>
-        <div style="margin-bottom:20px;">
-          <label style="display:flex;justify-content:space-between;color:var(--neon-cyan);margin-bottom:8px;">
-            <span>REFRESH INTERVAL (s)</span>
-            <input type="number" id="refresh-interval" value="10" min="3" max="60" style="width:60px;background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);padding:4px;text-align:center;">
-          </label>
-        </div>
-        <div style="margin-bottom:20px;">
-          <label style="display:flex;align-items:center;gap:10px;color:var(--neon-cyan);cursor:pointer;">
-            <input type="checkbox" id="sound-alert" style="accent-color:var(--neon-cyan);">
-            <span>ENABLE SOUND ALERTS</span>
-          </label>
-        </div>
-        <button class="close-btn" onclick="saveSettings()" style="width:100%;">SAVE</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
