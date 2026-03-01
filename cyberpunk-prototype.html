@@ -18,13 +18,19 @@
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace;
-      overflow-x: hidden; min-height: 100vh; padding: 20px;
+      background: var(--bg);
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+      min-height: 100vh;
+      padding: 20px;
       background-image: linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
       background-size: 40px 40px;
     }
     body::after {
-      content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      content: '';
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
       background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
       pointer-events: none; z-index: 9999;
     }
@@ -85,8 +91,7 @@
     .agent-name { font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700; color: var(--neon-cyan); }
     .agent-status { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: rgba(0,255,255,0.1); color: var(--neon-green); border: 1px solid var(--neon-cyan); }
     .agent-status.idle { color: var(--neon-amber); border-color: var(--neon-amber); background: rgba(255,170,0,0.1); }
-    .agent-status.highload { color: var(--neon-red); border-color: var(--neon-red); background: rgba(255,9,83,0.1); animation: blink 1s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .agent-status.highload { color: var(--neon-red); border-color: var(--neon-red); background: rgba(255,9,83,0.1); }
     .agent-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.75rem; color: #aaa; }
     .metric { display: flex; flex-direction: column; }
     .metric-label { color: #666; font-size: 0.65rem; text-transform: uppercase; }
@@ -123,14 +128,6 @@
     .chart-box { background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; padding: 15px; height: 300px; position: relative; }
     .chart-title { color: var(--neon-magenta); font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; }
     .chart-canvas { width: 100%; height: calc(100% - 30px); background: rgba(0,0,0,0.3); border: 1px solid rgba(0,255,255,0.2); border-radius: 4px; }
-    .alert-badge {
-      position: fixed; top: 20px; right: 20px; z-index: 9999;
-      background: var(--neon-red); color: #fff; padding: 10px 20px; border-radius: 4px;
-      font-family: 'Orbitron', monospace; font-size: 0.8rem; animation: alertPulse 1s infinite;
-      display: none;
-    }
-    .alert-badge.active { display: block; }
-    @keyframes alertPulse { 0%,100%{box-shadow:0 0 10px var(--neon-red)} 50%{box-shadow:0 0 20px var(--neon-red)} }
   </style>
 </head>
 <body>
@@ -138,8 +135,6 @@
   <div class="corner corner-tr"></div>
   <div class="corner corner-bl"></div>
   <div class="corner corner-br"></div>
-
-  <div class="alert-badge" id="alert-badge">⚠️ HIGH LOAD DETECTED</div>
 
   <div class="header">
     <div>
@@ -155,43 +150,40 @@
   <div class="system-bar">
     <div class="sys-item">
       <span class="sys-label">CPU</span>
-      <span class="sys-value" id="sys-cpu">--</span>
-      <div class="progress-mini"><div class="progress-mini-fill" id="cpu-bar" style="width: 0%; background: var(--neon-green);"></div></div>
+      <span class="sys-value" id="sys-cpu">12%</span>
+      <div class="progress-mini"><div class="progress-mini-fill" style="width: 12%; background: var(--neon-green);"></div></div>
     </div>
     <div class="sys-item">
       <span class="sys-label">MEM</span>
-      <span class="sys-value" id="sys-mem">--</span>
-      <div class="progress-mini"><div class="progress-mini-fill" id="mem-bar" style="width: 0%; background: var(--neon-cyan);"></div></div>
+      <span class="sys-value" id="sys-mem">4.2GB</span>
+      <div class="progress-mini"><div class="progress-mini-fill" style="width: 45%; background: var(--neon-cyan);"></div></div>
     </div>
     <div class="sys-item">
       <span class="sys-label">NET</span>
-      <span class="sys-value" id="sys-net">--</span>
+      <span class="sys-value" id="sys-net">↓2.1 ↑0.3 MB/s</span>
     </div>
     <div class="sys-item">
       <span class="sys-label">DISK</span>
-      <span class="sys-value" id="sys-disk">--</span>
+      <span class="sys-value" id="sys-disk">68%</span>
     </div>
   </div>
 
   <div class="main-layout">
-    <div class="agents-grid" id="agents-grid">
-      <!-- Agent cards rendered by JS -->
-    </div>
-
+    <div class="agents-grid" id="agents-grid"></div>
     <div class="side-panel">
       <div class="panel-box">
         <div class="panel-title">🌐 NETWORK TOPOLOGY</div>
         <svg class="topology-svg" id="topology"></svg>
       </div>
-
       <div class="panel-box">
         <div class="panel-title">📋 ACTIVITY LOG</div>
-        <div class="log-container" id="log-container"></div>
+        <div class="log-container" id="log-container">
+          <div class="log-entry"><span class="log-time">17:00</span><span class="log-agent">[WALL-G]</span><span class="log-msg">System initialized</span></div>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Agent Detail Modal -->
   <div class="modal" id="agent-modal">
     <div class="modal-content">
       <div class="modal-close" onclick="closeModal()">&times;</div>
@@ -200,71 +192,30 @@
         <button class="close-btn" onclick="closeModal()">CLOSE</button>
       </div>
       <div class="modal-body">
-        <div class="chart-box">
-          <div class="chart-title">Token Usage (Recent Sessions)</div>
-          <canvas class="chart-canvas" id="chart-token"></canvas>
-        </div>
-        <div class="chart-box">
-          <div class="chart-title">Session Load (24h)</div>
-          <canvas class="chart-canvas" id="chart-session"></canvas>
-        </div>
-        <div class="chart-box">
-          <div class="chart-title">Resource Usage (CPU/MEM)</div>
-          <canvas class="chart-canvas" id="chart-resource"></canvas>
-        </div>
+        <div class="chart-box"><div class="chart-title">Token Usage (24h)</div><canvas class="chart-canvas" id="chart-token"></canvas></div>
+        <div class="chart-box"><div class="chart-title">Session Load</div><canvas class="chart-canvas" id="chart-session"></canvas></div>
+        <div class="chart-box"><div class="chart-title">Resource Usage</div><canvas class="chart-canvas" id="chart-resource"></canvas></div>
       </div>
     </div>
   </div>
 
   <script>
-    const API_URL = '/api/status';
-    const ALERT_THRESHOLD = 80; // token usage % to trigger alert
-    
-    let agents = {};
-    let topologyAnimation;
-    let alertSound = null;
-
-    // Fetch real data from API
-    async function fetchStatus() {
-      try {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        
-        // Transform API data to our format
-        const transformed = {};
-        for (const [key, agent] of Object.entries(data)) {
-          transformed[key] = {
-            name: agent.name,
-            emoji: agent.emoji || '🤖',
-            status: agent.status,
-            sessions: agent.sessions,
-            tokens: agent.tokens || 0,
-            tokenLimit: agent.tokenLimit || 200000,
-            tokenPercent: agent.tokenPercent || Math.round((agent.tokens || 0) / (agent.tokenLimit || 200000) * 100),
-            cpu: Math.floor(Math.random() * 30) + 5, // Placeholder - would come from system metrics
-            mem: (Math.random() * 4 + 1).toFixed(1),
-            net: { down: (Math.random() * 5).toFixed(1), up: (Math.random() * 2).toFixed(1) },
-            skills: agent.skills || []
-          };
-        }
-        agents = transformed;
-        renderAgents();
-        updateSystemBar();
-        checkAlerts();
-        addLog('System', 'Data refreshed from API');
-      } catch (e) {
-        console.error('Fetch failed:', e);
-        addLog('ERROR', 'Failed to fetch status: ' + e.message);
-      }
-    }
+    const agents = {
+      'wall-g': { name: 'WALL-G', emoji: '🦞', status: 'BUSSY', sessions: 18, tokens: 51234, tokenLimit: 1000000, tokenPercent: 5, cpu: 12, mem: 4.2, net: { down: 2.1, up: 0.3 }, skills: ['Feishu', 'Discord', 'Memory'] },
+      'wall-c': { name: 'WALL-C', emoji: '💻', status: 'BUSSY', sessions: 783, tokens: 89012, tokenLimit: 1000000, tokenPercent: 9, cpu: 8, mem: 3.8, net: { down: 1.5, up: 0.2 }, skills: ['Feishu', 'Code', 'Tools'] },
+      'wall-e': { name: 'WALL-E', emoji: '🔔', status: 'BUSSY', sessions: 22, tokens: 12345, tokenLimit: 200000, tokenPercent: 6, cpu: 2, mem: 1.1, net: { down: 0.3, up: 0.1 }, skills: ['Exec', 'Monitor', 'Cron'] },
+      'wall-r': { name: 'WALL-R', emoji: '🤖', status: 'IDLE', sessions: 3, tokens: 2340, tokenLimit: 200000, tokenPercent: 1, cpu: 1, mem: 0.8, net: { down: 0.1, up: 0.0 }, skills: ['Reminders'] },
+      'wall-a': { name: 'WALL-A', emoji: '🟣', status: 'IDLE', sessions: 1, tokens: 567, tokenLimit: 200000, tokenPercent: 0, cpu: 0.5, mem: 0.6, net: { down: 0.0, up: 0.0 }, skills: ['Apple'] },
+      'wall-b': { name: 'WALL-B', emoji: '🔴', status: 'IDLE', sessions: 2, tokens: 890, tokenLimit: 200000, tokenPercent: 0, cpu: 0.8, mem: 0.7, net: { down: 0.0, up: 0.0 }, skills: ['Bot'] },
+      'wall-p': { name: 'WALL-P', emoji: '💜', status: 'IDLE', sessions: 1, tokens: 1200, tokenLimit: 200000, tokenPercent: 1, cpu: 0.6, mem: 0.9, net: { down: 0.0, up: 0.0 }, skills: ['Project'] },
+      'wall-x': { name: 'WALL-X', emoji: '🟡', status: 'IDLE', sessions: 4, tokens: 3456, tokenLimit: 1000000, tokenPercent: 0, cpu: 3, mem: 2.1, net: { down: 0.5, up: 0.1 }, skills: ['Chat'] }
+    };
 
     function renderAgents() {
       const grid = document.getElementById('agents-grid');
       let html = '';
       for (const [key, agent] of Object.entries(agents)) {
         const statusClass = agent.status === 'IDLE' ? 'idle' : agent.tokenPercent > 80 ? 'highload' : '';
-        const loadColor = agent.tokenPercent > 80 ? 'var(--neon-red)' : agent.tokenPercent > 50 ? 'var(--neon-amber)' : 'var(--neon-green)';
         html += `
           <div class="agent-card ${key}" onclick="openModal('${key}')">
             <div class="agent-header">
@@ -277,12 +228,10 @@
               <div class="metric"><span class="metric-label">MEM</span><span class="metric-value">${agent.mem} GB</span></div>
               <div class="metric"><span class="metric-label">NET ↓↑</span><span class="metric-value">${agent.net.down} / ${agent.net.up} MB/s</span></div>
             </div>
-            <div class="token-bar">
-              <div class="token-fill" style="width: ${agent.tokenPercent}%"></div>
-            </div>
+            <div class="token-bar"><div class="token-fill" style="width: ${agent.tokenPercent}%"></div></div>
             <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.7rem;">
               <span style="color: #666;">TOKENS</span>
-              <span style="color: ${loadColor};">${agent.tokens.toLocaleString()} / ${agent.tokenLimit.toLocaleString()} (${agent.tokenPercent}%)</span>
+              <span style="color: var(--neon-cyan);">${agent.tokens.toLocaleString()} / ${agent.tokenLimit.toLocaleString()} (${agent.tokenPercent}%)</span>
             </div>
           </div>
         `;
@@ -290,105 +239,10 @@
       grid.innerHTML = html;
     }
 
-    function updateSystemBar() {
-      // Simulated system-wide metrics (would be from real system monitoring)
-      const totalCpu = Object.values(agents).reduce((sum, a) => sum + a.cpu, 0);
-      const avgCpu = Math.round(totalCpu / Object.keys(agents).length);
-      const totalMem = Object.values(agents).reduce((sum, a) => sum + parseFloat(a.mem), 0);
-      const avgMem = (totalMem / Object.keys(agents).length).toFixed(1);
-      
-      document.getElementById('sys-cpu').textContent = avgCpu + '%';
-      document.getElementById('cpu-bar').style.width = avgCpu + '%';
-      document.getElementById('sys-mem').textContent = avgMem + 'GB';
-      document.getElementById('mem-bar').style.width = Math.min(100, (avgMem / 16) * 100) + '%';
-      document.getElementById('sys-net').textContent = `↓${(Math.random()*10).toFixed(1)} ↑${(Math.random()*5).toFixed(1)} MB/s`;
-      document.getElementById('sys-disk').textContent = '68%'; // placeholder
-    }
-
-    function checkAlerts() {
-      const highLoadAgents = Object.entries(agents).filter(([k,a]) => a.tokenPercent > ALERT_THRESHOLD);
-      const badge = document.getElementById('alert-badge');
-      if (highLoadAgents.length > 0) {
-        badge.classList.add('active');
-        badge.textContent = `⚠️ HIGH LOAD: ${highLoadAgents.map(([k,a]) => a.name).join(', ')}`;
-        // Could play sound here
-      } else {
-        badge.classList.remove('active');
-      }
-    }
-
-    function addLog(agent, msg) {
-      const container = document.getElementById('log-container');
+    function updateClock() {
       const now = new Date();
-      const time = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-      const entry = document.createElement('div');
-      entry.className = 'log-entry';
-      entry.innerHTML = `<span class="log-time">${time}</span><span class="log-agent">[${agent}]</span><span class="log-msg">${msg}</span>`;
-      container.insertBefore(entry, container.firstChild);
-      if (container.children.length > 10) container.removeChild(container.lastChild);
-    }
-
-    // Topology visualization
-    function drawTopology() {
-      const svg = document.getElementById('topology');
-      const w = svg.offsetWidth || 300;
-      const h = 200;
-      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-      
-      const nodes = Object.keys(agents);
-      const positions = {};
-      const centerX = w/2, centerY = h/2;
-      const radius = Math.min(w,h)/3;
-      
-      // Position nodes in a circle
-      nodes.forEach((node, i) => {
-        const angle = (i / nodes.length) * Math.PI * 2 - Math.PI/2;
-        positions[node] = {
-          x: centerX + Math.cos(angle) * radius,
-          y: centerY + Math.sin(angle) * radius
-        };
-      });
-
-      // Build SVG
-      let svgContent = '';
-      
-      // Connection lines (all-to-all for simplicity)
-      nodes.forEach((a, i) => {
-        nodes.slice(i+1).forEach(b => {
-          const pa = positions[a], pb = positions[b];
-          svgContent += `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" stroke="rgba(0,255,255,0.2)" stroke-width="1" />`;
-        });
-      });
-
-      // Nodes
-      nodes.forEach(node => {
-        const pos = positions[node];
-        const color = getNodeColor(node);
-        svgContent += `
-          <circle cx="${pos.x}" cy="${pos.y}" r="12" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2">
-            <animate attributeName="r" values="12;14;12" dur="2s" repeatCount="indefinite"/>
-          </circle>
-          <text x="${pos.x}" y="${pos.y+3}" text-anchor="middle" fill="#fff" font-size="8" font-family="Orbitron">${agents[node].emoji}</text>
-        `;
-      });
-
-      svg.innerHTML = svgContent;
-    }
-
-    function getNodeColor(node) {
-      const agent = agents[node];
-      if (!agent) return '#00ffff';
-      if (agent.status === 'IDLE') return 'var(--neon-amber)';
-      if (agent.tokenPercent > 80) return 'var(--neon-red)';
-      return 'var(--neon-cyan)';
-    }
-
-    // Modal charts
-    function initCharts() {
-      // In real version, would fetch historical data
-      drawLineChart('chart-token', [10,25,18,30,45,60,55,70,65,80,75,90], '#00ffff');
-      drawLineChart('chart-session', [15,18,22,19,25,30,28,35,32,40,38,45], '#ff00ff');
-      drawLineChart('chart-resource', [30,45,40,60,50,70,65,80,75,90,85,95], '#ffaa00');
+      document.getElementById('clock').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
+      document.getElementById('date').textContent = now.toLocaleDateString('zh-CN');
     }
 
     function drawLineChart(canvasId, data, color) {
@@ -412,12 +266,15 @@
       ctx.fill();
     }
 
-    // Modal controls
+    function initCharts() {
+      drawLineChart('chart-token', [10,25,18,30,45,60,55,70,65,80,75,90], '#00ffff');
+      drawLineChart('chart-session', [15,18,22,19,25,30,28,35,32,40,38,45], '#ff00ff');
+      drawLineChart('chart-resource', [30,45,40,60,50,70,65,80,75,90,85,95], '#ffaa00');
+    }
+
     function openModal(agentKey) {
-      const agent = agents[agentKey];
-      document.getElementById('modal-title').textContent = `${agent.emoji} ${agent.name} DETAIL`;
+      document.getElementById('modal-title').textContent = `${agents[agentKey].emoji} ${agents[agentKey].name} DETAIL`;
       initCharts();
-      addLog('UI', `Opened detail for ${agent.name}`);
       document.getElementById('agent-modal').classList.add('active');
     }
 
@@ -425,24 +282,9 @@
       document.getElementById('agent-modal').classList.remove('active');
     }
 
-    // Clock
-    function updateClock() {
-      const now = new Date();
-      document.getElementById('clock').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
-      document.getElementById('date').textContent = now.toLocaleDateString('zh-CN');
-    }
-
-    // Init
-    function init() {
-      fetchStatus();
-      updateClock();
-      setInterval(updateClock, 1000);
-      setInterval(fetchStatus, 10000);
-      setInterval(drawTopology, 5000);
-      drawTopology();
-    }
-
-    window.onload = init;
+    updateClock();
+    setInterval(updateClock, 1000);
+    renderAgents();
   </script>
 </body>
 </html>
