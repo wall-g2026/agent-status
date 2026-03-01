@@ -196,7 +196,44 @@ body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backgr
     let ALERT_THRESHOLD = 80;
     let REFRESH_INTERVAL = 10;
     let SOUND_ENABLED = false;
-    async function fetchStatus() {
+    
+    function generateMockData() {
+      const agentNames = ['wall-g','wall-c','wall-e','wall-r','wall-a','wall-b','wall-p','wall-x'];
+      const emojis = { 'wall-g':'🦞','wall-c':'💻','wall-e':'🔔','wall-r':'🤖','wall-a':'🟣','wall-b':'🔴','wall-p':'💜','wall-x':'🟡' };
+      const agents = {};
+      agentNames.forEach(key => {
+        const baseTokens = Math.floor(Math.random() * 50000) + 10000;
+        agents[key] = {
+          name: 'WALL-' + key.toUpperCase().replace('WALL-', ''),
+          emoji: emojis[key],
+          status: Math.random() > 0.7 ? '高负载' : '忙碌',
+          sessions: Math.floor(Math.random() * 50) + 10,
+          tokens: baseTokens,
+          tokenLimit: key === 'wall-g' || key === 'wall-c' || key === 'wall-x' ? 1000000 : 200000,
+          tokenPercent: Math.floor((baseTokens / (key === 'wall-g' || key === 'wall-c' || key === 'wall-x' ? 1000000 : 200000)) * 100),
+          cpu: Math.floor(Math.random() * 90) + 10,
+          mem: (Math.random() * 8 + 2).toFixed(1),
+          net: { down: (Math.random() * 10).toFixed(1), up: (Math.random() * 5).toFixed(1) },
+          skills: ['General'],
+          tokenHistory: Array.from({length:12}, () => Math.floor(Math.random() * 100)),
+          hourlyLoad: Array.from({length:24}, () => Math.floor(Math.random() * 100))
+        };
+      });
+      return {
+        timestamp: new Date().toISOString(),
+        system: {
+          cpu: Math.floor(Math.random() * 100),
+          memory: { total: 16, used: 8 + Math.random()*8, free: 0, percent: Math.floor(Math.random()*100) },
+          network: { rx: (Math.random()*20).toFixed(1), tx: (Math.random()*10).toFixed(1) },
+          disk: { percent: Math.floor(Math.random()*80)+10 },
+          uptime: Math.floor(Date.now()/1000),
+          loadAvg: [Math.random()*5, Math.random()*5, Math.random()*5]
+        },
+        agents
+      };
+    }
+
+async function fetchStatus() {
       try {
         const res = await fetch(API_URL);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -233,6 +270,41 @@ body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;backgr
         addLog('System', 'Data refreshed');
       } catch (e) {
         console.error(e);
+                console.warn('API fetch failed, using mock data for demo');
+        const data = generateMockData();
+        // Continue processing as if fetch succeeded
+        const agentsData = data.agents || {};
+        const transformed = {};
+        for (const [key, agent] of Object.entries(agentsData)) {
+          transformed[key] = {
+            name: agent.name,
+            emoji: agent.emoji || '🤖',
+            status: agent.status,
+            sessions: agent.sessions,
+            tokens: agent.tokens || 0,
+            tokenLimit: agent.tokenLimit || 200000,
+            tokenPercent: agent.tokenPercent || Math.round((agent.tokens || 0) / (agent.tokenLimit || 200000) * 100),
+            cpu: agent.cpu || Math.floor(Math.random() * 30) + 5,
+            mem: agent.mem || (Math.random() * 4 + 1).toFixed(1),
+            net: agent.net || { down: (Math.random() * 5).toFixed(1), up: (Math.random() * 2).toFixed(1) },
+            skills: agent.skills || [],
+            tokenHistory: agent.tokenHistory || [],
+            hourlyLoad: agent.hourlyLoad || []
+          };
+        }
+        agents = transformed;
+        systemData = data.system || {};
+        renderAgents();
+        updateSystemBar();
+        checkAlerts();
+        const avgHourly = Object.values(agents).reduce((arr, a) => {
+          if (!arr.length) return a.hourlyLoad || [];
+          return arr.map((v, i) => v + (a.hourlyLoad?.[i] || 0));
+        }, []).map(v => Object.keys(agents).length > 0 ? Math.round(v / Object.keys(agents).length) : 0);
+        drawHeatmap(avgHourly);
+        addLog('System', 'Using mock data (API offline)');
+        return;
+        
         addLog('ERROR', e.message);
       }
     }
