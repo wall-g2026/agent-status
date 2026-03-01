@@ -541,7 +541,7 @@
     </header>
     
     <div class="time-display">
-      <div class="time" id="clock">14:12:01</div>
+      <div class="time" id="clock">00:00:00</div>
       <div class="date" id="date">Loading...</div>
     </div>
     
@@ -552,7 +552,16 @@
         <div class="avatar-container">
           <div class="avatar">🦞</div>
         </div>
-        <h2 class="agent-name">WALL-G</h2><p class="agent-role">Agent G</p><div class="status-bar"><div class="status-item"><span class="status-label">状态</span><span class="status-value">忙碌</span></div><div class="status-item"><span class="status-label">模型</span><span class="status-value model">MiniMax M2.1</span></div><div class="status-item"><span class="status-label">会话</span><span class="status-value session">18</span></div>
+        <h2 class="agent-name">WALL-G</h2>
+        <p class="agent-role">主控 Agent</p>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="status-label">状态</span>
+            <span class="status-value">工作中</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">模型</span>
+            <span class="status-value model">Step 3.5</span>
           </div>
           <div class="status-item">
             <span class="status-label">Token</span>
@@ -563,7 +572,7 @@
           </div>
           <div class="status-item" style="margin-top: 8px;">
             <span class="status-label">会话</span>
-            <span class="status-value session">17</span>
+            <span class="status-value session">18</span>
           </div>
         </div>
         <div class="skills-container">
@@ -579,7 +588,16 @@
         <div class="avatar-container">
           <div class="avatar">💻</div>
         </div>
-        <h2 class="agent-name">WALL-C</h2><p class="agent-role">Agent C</p><div class="status-bar"><div class="status-item"><span class="status-label">状态</span><span class="status-value">忙碌</span></div><div class="status-item"><span class="status-label">模型</span><span class="status-value model">MiniMax M2.1</span></div><div class="status-item"><span class="status-label">会话</span><span class="status-value session">783</span></div>
+        <h2 class="agent-name">WALL-C</h2>
+        <p class="agent-role">编程助手</p>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="status-label">状态</span>
+            <span class="status-value">工作中</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">模型</span>
+            <span class="status-value model">Step 3.5</span>
           </div>
           <div class="status-item">
             <span class="status-label">Token</span>
@@ -590,7 +608,7 @@
           </div>
           <div class="status-item" style="margin-top: 8px;">
             <span class="status-label">会话</span>
-            <span class="status-value session">786</span>
+            <span class="status-value session">783</span>
           </div>
         </div>
         <div class="skills-container">
@@ -601,7 +619,21 @@
       </div>
       
       <!-- WALL-E -->
-      <div class="agent-card wall-e"><div class="status-light busy"></div><div class="avatar-container"><div class="avatar">🔵</div></div><h2 class="agent-name">WALL-E</h2><p class="agent-role">Agent E</p><div class="status-bar"><div class="status-item"><span class="status-label">状态</span><span class="status-value">忙碌</span></div><div class="status-item"><span class="status-label">模型</span><span class="status-value model">MiniMax M2.1</span></div><div class="status-item"><span class="status-label">会话</span><span class="status-value session">22</span></div>
+      <div class="agent-card wall-e" id="card-wall-e">
+        <div class="status-light"></div>
+        <div class="avatar-container">
+          <div class="avatar">🔔</div>
+        </div>
+        <h2 class="agent-name">WALL-E</h2>
+        <p class="agent-role">定时任务</p>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="status-label">状态</span>
+            <span class="status-value">空闲</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">模型</span>
+            <span class="status-value model">Step 3.5</span>
           </div>
           <div class="status-item">
             <span class="status-label">Token</span>
@@ -612,7 +644,7 @@
           </div>
           <div class="status-item" style="margin-top: 8px;">
             <span class="status-label">会话</span>
-            <span class="status-value session">24</span>
+            <span class="status-value session">22</span>
           </div>
         </div>
         <div class="skills-container">
@@ -622,7 +654,21 @@
       </div>
       
       <!-- WALL-R -->
-      <div class="agent-card wall-r"><div class="status-light busy"></div><div class="avatar-container"><div class="avatar">🔵</div></div><h2 class="agent-name">WALL-R</h2><p class="agent-role">Agent R</p><div class="status-bar"><div class="status-item"><span class="status-label">状态</span><span class="status-value">忙碌</span></div><div class="status-item"><span class="status-label">模型</span><span class="status-value model">MiniMax M2.1</span></div><div class="status-item"><span class="status-label">会话</span><span class="status-value session">3</span></div>
+      <div class="agent-card wall-r" id="card-wall-r">
+        <div class="status-light"></div>
+        <div class="avatar-container">
+          <div class="avatar">🤖</div>
+        </div>
+        <h2 class="agent-name">WALL-R</h2>
+        <p class="agent-role">响应 Agent</p>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="status-label">状态</span>
+            <span class="status-value">空闲</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">模型</span>
+            <span class="status-value model">Step 3.5</span>
           </div>
           <div class="status-item">
             <span class="status-label">Token</span>
@@ -633,7 +679,7 @@
           </div>
           <div class="status-item" style="margin-top: 8px;">
             <span class="status-label">会话</span>
-            <span class="status-value session">2</span>
+            <span class="status-value session">3</span>
           </div>
         </div>
         <div class="skills-container">
@@ -643,7 +689,21 @@
       </div>
       
       <!-- WALL-A -->
-      <div class="agent-card wall-a"><div class="status-light busy"></div><div class="avatar-container"><div class="avatar">🔵</div></div><h2 class="agent-name">WALL-A</h2><p class="agent-role">Agent A</p><div class="status-bar"><div class="status-item"><span class="status-label">状态</span><span class="status-value">忙碌</span></div><div class="status-item"><span class="status-label">模型</span><span class="status-value model">MiniMax M2.1</span></div><div class="status-item"><span class="status-label">会话</span><span class="status-value session">1</span></div>
+      <div class="agent-card wall-a" id="card-wall-a">
+        <div class="status-light"></div>
+        <div class="avatar-container">
+          <div class="avatar">🟣</div>
+        </div>
+        <h2 class="agent-name">WALL-A</h2>
+        <p class="agent-role">Agent A</p>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="status-label">状态</span>
+            <span class="status-value">空闲</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">模型</span>
+            <span class="status-value model">Step 3.5</span>
           </div>
           <div class="status-item">
             <span class="status-label">Token</span>
@@ -663,7 +723,21 @@
       </div>
       
       <!-- WALL-B -->
-      <div class="agent-card wall-b"><div class="status-light busy"></div><div class="avatar-container"><div class="avatar">🔵</div></div><h2 class="agent-name">WALL-B</h2><p class="agent-role">Agent B</p><div class="status-bar"><div class="status-item"><span class="status-label">状态</span><span class="status-value">忙碌</span></div><div class="status-item"><span class="status-label">模型</span><span class="status-value model">MiniMax M2.1</span></div><div class="status-item"><span class="status-label">会话</span><span class="status-value session">2</span></div>
+      <div class="agent-card wall-b" id="card-wall-b">
+        <div class="status-light"></div>
+        <div class="avatar-container">
+          <div class="avatar">🔴</div>
+        </div>
+        <h2 class="agent-name">WALL-B</h2>
+        <p class="agent-role">Agent B</p>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="status-label">状态</span>
+            <span class="status-value">空闲</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">模型</span>
+            <span class="status-value model">Step 3.5</span>
           </div>
           <div class="status-item">
             <span class="status-label">Token</span>
@@ -674,7 +748,7 @@
           </div>
           <div class="status-item" style="margin-top: 8px;">
             <span class="status-label">会话</span>
-            <span class="status-value session">2</span>
+            <span class="status-value session">3</span>
           </div>
         </div>
         <div class="skills-container">
@@ -683,7 +757,21 @@
       </div>
       
       <!-- WALL-P -->
-      <div class="agent-card wall-p"><div class="status-light busy"></div><div class="avatar-container"><div class="avatar">🔵</div></div><h2 class="agent-name">WALL-P</h2><p class="agent-role">Agent P</p><div class="status-bar"><div class="status-item"><span class="status-label">状态</span><span class="status-value">忙碌</span></div><div class="status-item"><span class="status-label">模型</span><span class="status-value model">MiniMax M2.1</span></div><div class="status-item"><span class="status-label">会话</span><span class="status-value session">1</span></div>
+      <div class="agent-card wall-p" id="card-wall-p">
+        <div class="status-light"></div>
+        <div class="avatar-container">
+          <div class="avatar">🔵</div>
+        </div>
+        <h2 class="agent-name">WALL-P</h2>
+        <p class="agent-role">Agent P</p>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="status-label">状态</span>
+            <span class="status-value">空闲</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">模型</span>
+            <span class="status-value model">Step 3.5</span>
           </div>
           <div class="status-item">
             <span class="status-label">Token</span>
@@ -703,7 +791,21 @@
       </div>
       
       <!-- WALL-X -->
-      <div class="agent-card wall-x"><div class="status-light busy"></div><div class="avatar-container"><div class="avatar">🔵</div></div><h2 class="agent-name">WALL-X</h2><p class="agent-role">Agent X</p><div class="status-bar"><div class="status-item"><span class="status-label">状态</span><span class="status-value">忙碌</span></div><div class="status-item"><span class="status-label">模型</span><span class="status-value model">Step 3.5</span></div><div class="status-item"><span class="status-label">会话</span><span class="status-value session">4</span></div>
+      <div class="agent-card wall-x" id="card-wall-x">
+        <div class="status-light"></div>
+        <div class="avatar-container">
+          <div class="avatar">🟡</div>
+        </div>
+        <h2 class="agent-name">WALL-X</h2>
+        <p class="agent-role">Agent X</p>
+        <div class="status-bar">
+          <div class="status-item">
+            <span class="status-label">状态</span>
+            <span class="status-value">空闲</span>
+          </div>
+          <div class="status-item">
+            <span class="status-label">模型</span>
+            <span class="status-value model">Step 3.5</span>
           </div>
           <div class="status-item">
             <span class="status-label">Token</span>
