@@ -51,7 +51,6 @@ function getSystemMetrics() {
   };
 }
 
-// Cache for hourly stats (10 min)
 let hourlyCache = null;
 let hourlyCacheTime = 0;
 const CACHE_TTL = 10 * 60 * 1000;
@@ -62,7 +61,6 @@ function getHourlyStats(agentName) {
     return hourlyCache[agentName];
   }
   
-  // Build fresh cache
   if (!hourlyCache) hourlyCache = {};
   const sessionsPath = path.join(AGENTS_DIR, agentName, 'sessions');
   if (!fs.existsSync(sessionsPath)) {
@@ -70,16 +68,13 @@ function getHourlyStats(agentName) {
     return hourlyCache[agentName];
   }
   
-  // 24 buckets (0-23 UTC)
   const buckets = new Array(24).fill(null).map(() => ({ sum: 0, count: 0 }));
   
   try {
     const files = fs.readdirSync(sessionsPath).filter(f => f.endsWith('.jsonl') && !f.includes('.deleted'));
-    // Process each file
     for (const file of files) {
       const filePath = path.join(sessionsPath, file);
       const stat = fs.statSync(filePath);
-      // Only consider recent files (last 24h)
       if (Date.now() - stat.mtime.getTime() > 24 * 60 * 60 * 1000) continue;
       
       try {
@@ -121,7 +116,6 @@ function getAgentStatus() {
         sessionCount = fs.readdirSync(sessionsPath).filter(f => f.endsWith('.jsonl') && !f.includes('.deleted')).length;
       }
 
-      // Get hourly stats
       const hourlyStats = getHourlyStats(agent);
       const nonZero = hourlyStats.filter(v => v > 0);
       const avgTokens = nonZero.length > 0 ? Math.round(nonZero.reduce((s, v) => s + v, 0) / nonZero.length) : 0;
@@ -135,7 +129,6 @@ function getAgentStatus() {
       const isHighLoad = tokenPercent > 70 || cpu > 80;
       let statusText = isActive ? (isHighLoad ? '高负载' : '忙碌') : '空闲';
       
-      // Convert hourlyStats to percentage for heatmap (0-100)
       const hourlyLoad = hourlyStats.map(v => Math.min(100, Math.round((v / config.contextLimit) * 100)));
       
       status[agent] = {
@@ -144,14 +137,14 @@ function getAgentStatus() {
         emoji: config.emoji,
         skills: config.skills,
         sessions: sessionCount,
-        tokens: avgTokens,
+        tokens: Math.round(avgTokens),
         tokenLimit: config.contextLimit,
         tokenPercent,
         status: statusText,
         cpu,
         mem: parseFloat(mem),
         net: { down: (Math.random() * 5).toFixed(1), up: (Math.random() * 2).toFixed(1) },
-        tokenHistory: hourlyStats.slice(0, 12),
+        tokenHistory: hourlyStats.slice(0, 12).map(v => Math.round((v / config.contextLimit) * 100)),
         hourlyLoad,
         lastSeen: null
       };

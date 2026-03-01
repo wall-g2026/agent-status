@@ -224,7 +224,6 @@
 
   <script>
     const API_URL = '/api/status';
-    const ALERT_THRESHOLD = 80; // token usage % to trigger alert
     
     let agents = {};
     let systemData = {};
@@ -239,6 +238,9 @@
         const data = await res.json();
         
         // Use agents from API directly, preserve all fields
+        console.log('[DEBUG] API data received:', data);
+        console.log('[DEBUG] agentsData count:', Object.keys(agentsData).length);
+        console.log('[DEBUG] transformed:', transformed);
         const agentsData = data.agents || {};
         const transformed = {};
         for (const [key, agent] of Object.entries(agentsData)) {
@@ -278,6 +280,11 @@
     }
 
     function renderAgents() {
+      if (Object.keys(agents).length === 0) {
+        console.warn('[DEBUG] agents is empty, rendering placeholder');
+        grid.innerHTML = '<div style="grid-column:1/-1;color:var(--neon-cyan);">NO DATA AVAILABLE - CHECK API</div>';
+        return;
+      }
       const grid = document.getElementById('agents-grid');
       let html = '';
       for (const [key, agent] of Object.entries(agents)) {
@@ -435,14 +442,17 @@
     function openModal(agentKey) {
       const agent = agents[agentKey];
       document.getElementById('modal-title').textContent = `${agent.emoji} ${agent.name} DETAIL`;
+      // tokenHistory is already percentage (0-100) from API
       const tokenData = agent.tokenHistory && agent.tokenHistory.length > 0 
-        ? agent.tokenHistory.map(t => Math.round((t / agent.tokenLimit) * 100))
+        ? agent.tokenHistory
         : [10,25,18,30,45,60,55,70,65,80,75,90];
+      // sessionData: show simulated load derived from token usage
       const sessionData = agent.tokenHistory && agent.tokenHistory.length > 0
-        ? agent.tokenHistory.map(t => Math.round((t / agent.tokenLimit) * 60 + 20))
+        ? agent.tokenHistory.map(t => Math.round(t * 0.8 + 10))
         : [15,18,22,19,25,30,28,35,32,40,38,45];
+      // resourceData: CPU/MEM simulated from token usage
       const resourceData = agent.tokenHistory && agent.tokenHistory.length > 0
-        ? agent.tokenHistory.map(t => Math.round((t / agent.tokenLimit) * 70 + 15))
+        ? agent.tokenHistory.map(t => Math.round(t * 0.7 + 15))
         : [30,45,40,60,50,70,65,80,75,90,85,95];
       drawLineChart('chart-token', tokenData, '#00ffff');
       drawLineChart('chart-session', sessionData, '#ff00ff');
@@ -459,21 +469,44 @@
     // Heatmap
     function drawHeatmap(data) {
       const canvas = document.getElementById("heatmap");
-      if (!canvas) return;
+      if (!canvas || !data || data.length === 0) return;
       const ctx = canvas.getContext("2d");
       const w = canvas.width = canvas.offsetWidth;
       const h = canvas.height = canvas.offsetHeight;
       ctx.clearRect(0,0,w,h);
+      
       const cellW = w / 24;
-      const cellH = h / 1;
+      const cellH = h;
+      
+      // Find max for normalization, but ensure at least 1 to avoid division by zero
+      const maxVal = Math.max(...data, 1);
+      
       data.forEach((val, i) => {
-        let color;
-        if (val < 50) color = "rgba(0,255,136," + (0.3 + val/100) + ")";
-        else if (val < 80) color = "rgba(255,170,0," + (0.3 + (val-50)/100) + ")";
-        else color = "rgba(255,9,83," + (0.3 + (val-80)/100) + ")";
-        ctx.fillStyle = color;
-        ctx.fillRect(i*cellW, 0, cellW-1, h);
+        // Normalize to 0-100
+        const pct = Math.min(100, Math.round((val / maxVal) * 100));
+        
+        let r, g, b;
+        if (pct < 33) {
+          // Dark to bright green
+          const intensity = pct / 33;
+          r = 0; g = Math.floor(136 + (119 * intensity)); b = 136;
+        } else if (pct < 66) {
+          // Green to yellow
+          const t = (pct - 33) / 33;
+          r = Math.floor(255 * t); g = 255; b = Math.floor(136 * (1 - t));
+        } else {
+          // Yellow to red
+          const t = (pct - 66) / 34;
+          r = 255; g = Math.floor(255 * (1 - t)); b = Math.floor(136 * (1 - t));
+        }
+        
+        // Higher base opacity: 0.6 + (pct/100)*0.4 => range 0.6-1.0
+        const a = 0.6 + (pct / 100) * 0.4;
+        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+        ctx.fillRect(i*cellW, 0, cellW-1, cellH);
       });
+      
+      // Hour labels below
       ctx.fillStyle = "var(--neon-cyan)";
       ctx.font = "10px JetBrains Mono";
       ctx.textAlign = "center";
@@ -481,7 +514,6 @@
         ctx.fillText(i+"h", i*cellW + cellW/2, h - 4);
       }
     }
-
     // Settings
     let ALERT_THRESHOLD = 80;
     let REFRESH_INTERVAL = 10;
