@@ -224,19 +224,22 @@
 
   <script>
     const API_URL = '/api/status';
+    const ALERT_THRESHOLD = 80; // token usage % to trigger alert
+    
     let agents = {};
     let systemData = {};
-    let refreshTimer;
-    let ALERT_THRESHOLD = 80;
-    let REFRESH_INTERVAL = 10;
-    let SOUND_ENABLED = false;
-    
-    // Fetch
-    async function fetchStatus() {
+    let refreshTimer;;
+    let topologyAnimation;
+    let alertSound = null;
+
+    // Fetch real data from API
+        async function fetchStatus() {
       try {
         const res = await fetch(API_URL);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        
+        // Use API agents directly
         const agentsData = data.agents || {};
         const transformed = {};
         for (const [key, agent] of Object.entries(agentsData)) {
@@ -266,19 +269,53 @@
           return arr.map((v, i) => v + (a.hourlyLoad?.[i] || 0));
         }, []).map(v => Object.keys(agents).length > 0 ? Math.round(v / Object.keys(agents).length) : 0);
         drawHeatmap(avgHourly);
-        addLog('System', 'Data refreshed');
+        addLog('System', 'Data refreshed from API');
       } catch (e) {
-        console.error(e);
-        addLog('ERROR', e.message);
+        console.error('Fetch failed:', e);
+        addLog('ERROR', 'Failed to fetch status: ' + e.message);
       }
     }
-    
-    // Render agents grid
+sync function fetchStatus() {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}
+        const avgHourly = Object.values(agents).reduce((arr,a)=>{if(!arr.length)return a.hourlyLoad||[];return arr.map((v,i)=>v+(a.hourlyLoad?.[i]||0));},[]).map(v=>Object.keys(agents).length?Math.round(v/Object.keys(agents).length):0);
+        drawHeatmap(avgHourly);`);
+        const data = await res.json();
+        
+        // Transform API data to our format
+        const transformed = {};
+        for (const [key, agent] of Object.entries(data)) {
+          transformed[key] = {
+            name: agent.name,
+            emoji: agent.emoji || '🤖',
+            status: agent.status,
+            sessions: agent.sessions,
+            tokens: agent.tokens || 0,
+            tokenLimit: agent.tokenLimit || 200000,
+            tokenPercent: agent.tokenPercent || Math.round((agent.tokens || 0) / (agent.tokenLimit || 200000) * 100),
+            cpu: Math.floor(Math.random() * 30) + 5, // Placeholder - would come from system metrics
+            mem: (Math.random() * 4 + 1).toFixed(1),
+            net: { down: (Math.random() * 5).toFixed(1), up: (Math.random() * 2).toFixed(1) },
+            skills: agent.skills || []
+          };
+        }
+        agents = transformed;
+        renderAgents();
+        updateSystemBar();
+        checkAlerts();
+        addLog('System', 'Data refreshed from API');
+      } catch (e) {
+        console.error('Fetch failed:', e);
+        addLog('ERROR', 'Failed to fetch status: ' + e.message);
+      }
+    }
+
     function renderAgents() {
       const grid = document.getElementById('agents-grid');
       let html = '';
       for (const [key, agent] of Object.entries(agents)) {
-        const statusClass = agent.tokenPercent > 80 ? 'highload' : '';
+        const statusClass = agent.status === 'IDLE' ? 'idle' : agent.tokenPercent > 80 ? 'highload' : '';
         const loadColor = agent.tokenPercent > 80 ? 'var(--neon-red)' : agent.tokenPercent > 50 ? 'var(--neon-amber)' : 'var(--neon-green)';
         html += `
           <div class="agent-card ${key}" onclick="openModal('${key}')">
@@ -292,47 +329,150 @@
               <div class="metric"><span class="metric-label">MEM</span><span class="metric-value">${agent.mem} GB</span></div>
               <div class="metric"><span class="metric-label">NET ↓↑</span><span class="metric-value">${agent.net.down} / ${agent.net.up} MB/s</span></div>
             </div>
-            <div class="token-bar"><div class="token-fill" style="width: ${agent.tokenPercent}%"></div></div>
-            <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:0.7rem;">
-              <span style="color:#666;">TOKENS</span>
-              <span style="color:${loadColor};">${agent.tokens.toLocaleString()} / ${agent.tokenLimit.toLocaleString()} (${agent.tokenPercent}%)</span>
+            <div class="token-bar">
+              <div class="token-fill" style="width: ${agent.tokenPercent}%"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.7rem;">
+              <span style="color: #666;">TOKENS</span>
+              <span style="color: ${loadColor};">${agent.tokens.toLocaleString()} / ${agent.tokenLimit.toLocaleString()} (${agent.tokenPercent}%)</span>
             </div>
           </div>
         `;
       }
       grid.innerHTML = html;
     }
-    
-    // Update system bar
+
     function updateSystemBar() {
-      const cpu = systemData.cpu || Math.round(Object.values(agents).reduce((sum, a) => sum + (a.cpu || 0), 0) / Math.max(1, Object.keys(agents).length));
-      const mem = systemData.memory?.percent || Math.round(Object.values(agents).reduce((sum, a) => sum + parseFloat(a.mem || 0), 0) / Math.max(1, Object.keys(agents).length));
-      const netRx = systemData.network?.rx || (Math.random() * 10).toFixed(1);
-      const netTx = systemData.network?.tx || (Math.random() * 5).toFixed(1);
-      const disk = systemData.disk?.percent || 68;
-      document.getElementById('sys-cpu').textContent = cpu + '%';
-      document.getElementById('cpu-bar').style.width = cpu + '%';
-      document.getElementById('sys-mem').textContent = mem + '%';
-      document.getElementById('mem-bar').style.width = Math.min(100, mem) + '%';
-      document.getElementById('sys-net').textContent = `↓${netRx} ↑${netTx} MB/s`;
-      document.getElementById('sys-disk').textContent = disk + '%';
+      // Simulated system-wide metrics (would be from real system monitoring)
+      const totalCpu = Object.values(agents).reduce((sum, a) => sum + a.cpu, 0);
+      const avgCpu = Math.round(totalCpu / Object.keys(agents).length);
+      const totalMem = Object.values(agents).reduce((sum, a) => sum + parseFloat(a.mem), 0);
+      const avgMem = (totalMem / Object.keys(agents).length).toFixed(1);
+      
+      document.getElementById('sys-cpu').textContent = avgCpu + '%';
+      document.getElementById('cpu-bar').style.width = avgCpu + '%';
+      document.getElementById('sys-mem').textContent = avgMem + 'GB';
+      document.getElementById('mem-bar').style.width = Math.min(100, (avgMem / 16) * 100) + '%';
+      document.getElementById('sys-net').textContent = `↓${(Math.random()*10).toFixed(1)} ↑${(Math.random()*5).toFixed(1)} MB/s`;
+      document.getElementById('sys-disk').textContent = '68%'; // placeholder
     }
-    
-    // Alerts
+
     function checkAlerts() {
+      const highLoadAgents = Object.entries(agents).filter(([k,a]) => a.tokenPercent > ALERT_THRESHOLD);
       const badge = document.getElementById('alert-badge');
-      const high = Object.values(agents).some(a => a.tokenPercent > ALERT_THRESHOLD);
-      badge.style.display = high ? 'block' : 'none';
+      if (highLoadAgents.length > 0) {
+        badge.classList.add('active');
+        badge.textContent = `⚠️ HIGH LOAD: ${highLoadAgents.map(([k,a]) => a.name).join(', ')}`;
+        // Could play sound here
+      } else {
+        badge.classList.remove('active');
+      }
     }
-    
-    // Log
+
     function addLog(agent, msg) {
       const container = document.getElementById('log-container');
       const now = new Date();
       const time = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-      container.innerHTML += `<div class="log-entry"><span class="log-time">${time}</span><span class="log-agent">${agent}</span><span>${msg}</span></div>`;
-      container.scrollTop = container.scrollHeight;
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-time">${time}</span><span class="log-agent">[${agent}]</span><span class="log-msg">${msg}</span>`;
+      container.insertBefore(entry, container.firstChild);
+      if (container.children.length > 10) container.removeChild(container.lastChild);
     }
+
+    // Topology visualization
+    function drawTopology() {
+      const svg = document.getElementById('topology');
+      const w = svg.offsetWidth || 300;
+      const h = 200;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      
+      const nodes = Object.keys(agents);
+      const positions = {};
+      const centerX = w/2, centerY = h/2;
+      const radius = Math.min(w,h)/3;
+      
+      // Position nodes in a circle
+      nodes.forEach((node, i) => {
+        const angle = (i / nodes.length) * Math.PI * 2 - Math.PI/2;
+        positions[node] = {
+          x: centerX + Math.cos(angle) * radius,
+          y: centerY + Math.sin(angle) * radius
+        };
+      });
+
+      // Build SVG
+      let svgContent = '';
+      
+      // Connection lines (all-to-all for simplicity)
+      nodes.forEach((a, i) => {
+        nodes.slice(i+1).forEach(b => {
+          const pa = positions[a], pb = positions[b];
+          svgContent += `<line x1="${pa.x}" y1="${pa.y}" x2="${pb.x}" y2="${pb.y}" stroke="rgba(0,255,255,0.2)" stroke-width="1" />`;
+        });
+      });
+
+      // Nodes
+      nodes.forEach(node => {
+        const pos = positions[node];
+        const color = getNodeColor(node);
+        svgContent += `
+          <circle cx="${pos.x}" cy="${pos.y}" r="12" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2">
+            <animate attributeName="r" values="12;14;12" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <text x="${pos.x}" y="${pos.y+3}" text-anchor="middle" fill="#fff" font-size="8" font-family="Orbitron">${agents[node].emoji}</text>
+        `;
+      });
+
+      svg.innerHTML = svgContent;
+    }
+
+    function getNodeColor(node) {
+      const agent = agents[node];
+      if (!agent) return '#00ffff';
+      if (agent.status === 'IDLE') return 'var(--neon-amber)';
+      if (agent.tokenPercent > 80) return 'var(--neon-red)';
+      return 'var(--neon-cyan)';
+    }
+
+    // Modal charts
+    function initCharts() {
+      // In real version, would fetch historical data
+      drawLineChart('chart-token', [10,25,18,30,45,60,55,70,65,80,75,90], '#00ffff');
+      drawLineChart('chart-session', [15,18,22,19,25,30,28,35,32,40,38,45], '#ff00ff');
+      drawLineChart('chart-resource', [30,45,40,60,50,70,65,80,75,90,85,95], '#ffaa00');
+    }
+
+    function drawLineChart(canvasId, data, color) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.offsetWidth;
+      const h = canvas.height = canvas.offsetHeight;
+      ctx.clearRect(0,0,w,h);
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowColor = color; ctx.shadowBlur = 10;
+      ctx.beginPath();
+      const step = w / (data.length - 1);
+      data.forEach((val, i) => {
+        const x = i * step;
+        const y = h - (val / 100) * h;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      ctx.lineTo(w, h); ctx.lineTo(0, h);
+      ctx.fillStyle = color.replace(')', ', 0.1)').replace('rgb', 'rgba');
+      ctx.fill();
+    }
+
+    // Modal controls
+    function openModal(agentKey) {
+      const agent = agents[agentKey];
+      document.getElementById('modal-title').textContent = `${agent.emoji} ${agent.name} DETAIL`;
+      initCharts();
+      addLog('UI', `Opened detail for ${agent.name}`);
+      document.getElementById('agent-modal').classList.add('active');
+    }
+
     
     // Heatmap
     function drawHeatmap(data) {
@@ -360,15 +500,23 @@
         ctx.fillText(i+'h', i*cellW + cellW/2, h - 4);
       }
     }
-    
+
     // Settings
+    let ALERT_THRESHOLD = 80;
+    let REFRESH_INTERVAL = 10;
+    let SOUND_ENABLED = false;
+
     function openSettings() {
       document.getElementById('settings-modal').classList.add('active');
       document.getElementById('alert-threshold').value = ALERT_THRESHOLD;
       document.getElementById('refresh-interval').value = REFRESH_INTERVAL;
       document.getElementById('sound-alert').checked = SOUND_ENABLED;
     }
-    function closeSettings() { document.getElementById('settings-modal').classList.remove('active'); }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').classList.remove('active');
+    }
+
     function saveSettings() {
       ALERT_THRESHOLD = parseInt(document.getElementById('alert-threshold').value) || 80;
       REFRESH_INTERVAL = parseInt(document.getElementById('refresh-interval').value) || 10;
@@ -379,6 +527,7 @@
       clearInterval(refreshTimer);
       refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
     }
+
     function loadSettings() {
       try {
         const saved = JSON.parse(localStorage.getItem('dashboardSettings') || '{}');
@@ -387,18 +536,18 @@
         if (saved.SOUND_ENABLED !== undefined) SOUND_ENABLED = saved.SOUND_ENABLED;
       } catch (e) {}
     }
-    
-    // Placeholder modal functions (existing modal HTML remains)
-    function openModal(key) { /* existing modal logic */ }
-    function closeModal() { document.getElementById('agent-modal').classList.remove('active'); }
-    
+
+function closeModal() {
+      document.getElementById('agent-modal').classList.remove('active');
+    }
+
     // Clock
     function updateClock() {
       const now = new Date();
       document.getElementById('clock').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
       document.getElementById('date').textContent = now.toLocaleDateString('zh-CN');
     }
-    
+
     // Init
     function init() {
       loadSettings();
@@ -406,8 +555,11 @@
       updateClock();
       setInterval(updateClock, 1000);
       refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
+      setInterval(fetchStatus, 10000);
+      setInterval(drawTopology, 5000);
+      drawTopology();
     }
-    
+
     window.onload = init;
   </script>
 
