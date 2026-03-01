@@ -6,515 +6,131 @@
   <title>WALL TEAM // CYBERPUNK MONITOR</title>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-/* PURE CYBERPUNK DASHBOARD - HARD CORE */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-
-:root {
-  --neon-cyan: #00ffff;
-  --neon-magenta: #ff00ff;
-  --neon-amber: #ffaa00;
-  --neon-red: #ff0953;
-  --neon-green: #00ff88;
-  --bg-dark: #050505;
-  --bg-panel: rgba(0, 10, 15, 0.85);
-  --grid-color: rgba(0, 255, 255, 0.07);
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: var(--bg-dark);
-  color: var(--neon-cyan);
-  font-family: 'JetBrains Mono', monospace;
-  min-height: 100vh;
-  padding: 20px;
-  overflow-x: hidden;
-  position: relative;
-}
-
-/* Grid background */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: 
-    linear-gradient(var(--grid-color) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Scanlines effect */
-body::after {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0,0,0,0.15),
-    rgba(0,0,0,0.15) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.6;
-}
-
-.container {
-  max-width: 1600px;
-  margin: 0 auto;
-  position: relative;
-  z-index: 1;
-}
-
-/* Header */
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  padding: 15px 25px;
-  background: var(--bg-panel);
-  border: 1px solid var(--neon-cyan);
-  border-radius: 4px;
-  box-shadow: 0 0 20px rgba(0,255,255,0.2);
-}
-
-.title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 10px var(--neon-cyan);
-  letter-spacing: 2px;
-}
-
-.clock {
-  font-size: 1.2rem;
-  color: var(--neon-amber);
-  text-shadow: 0 0 10px var(--neon-amber);
-}
-
-/* System Bar */
-.sys-bar {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.sys-item {
-  background: var(--bg-panel);
-  border: 1px solid rgba(0,255,255,0.4);
-  padding: 12px 15px;
-  border-radius: 4px;
-  position: relative;
-}
-
-.sys-label {
-  font-size: 0.7rem;
-  color: rgba(0,255,255,0.7);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-
-.sys-value {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--neon-green);
-  text-shadow: 0 0 8px var(--neon-green);
-}
-
-.sys-bar .progress {
-  height: 4px;
-  background: rgba(0,255,255,0.2);
-  margin-top: 6px;
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.sys-bar .progress-fill {
-  height: 100%;
-  background: var(--neon-cyan);
-  box-shadow: 0 0 10px var(--neon-cyan);
-  transition: width 0.5s ease;
-}
-
-/* Main layout */
-.main-layout {
-  display: grid;
-  grid-template-columns: 1fr 320px;
-  gap: 20px;
-}
-
-/* Agents Grid */
-.agents-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-}
-
-@media (max-width: 1400px) { .agents-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 1100px) { .agents-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 700px) { .agents-grid { grid-template-columns: 1fr); } }
-
-.agent-card {
-  background: var(--bg-panel);
-  border: 1px solid rgba(0,255,255,0.3);
-  border-radius: 4px;
-  padding: 15px;
-  position: relative;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  overflow: hidden;
-}
-
-.agent-card:hover {
-  border-color: var(--neon-cyan);
-  box-shadow: 0 0 20px rgba(0,255,255,0.4);
-  transform: translateY(-2px);
-}
-
-.agent-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; height: 2px;
-  background: linear-gradient(90deg, transparent, var(--neon-cyan), transparent);
-  animation: scan 2s linear infinite;
-}
-
-@keyframes scan {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-.agent-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.agent-name {
-  font-weight: 700;
-  font-size: 1rem;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 8px var(--neon-cyan);
-}
-
-.agent-status {
-  font-size: 0.75rem;
-  padding: 4px 8px;
-  border-radius: 2px;
-  background: rgba(0,255,255,0.2);
-  color: var(--neon-cyan);
-  text-transform: uppercase;
-}
-
-.agent-status.highload {
-  background: rgba(255,9,83,0.3);
-  color: var(--neon-red);
-  border: 1px solid var(--neon-red);
-  animation: pulse 1s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%,100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-.agent-metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.metric {
-  display: flex;
-  flex-direction: column;
-}
-
-.metric-label {
-  font-size: 0.65rem;
-  color: rgba(0,255,255,0.6);
-  margin-bottom: 2px;
-}
-
-.metric-value {
-  font-size: 0.9rem;
-  color: #fff;
-  font-weight: 700;
-}
-
-.token-bar {
-  height: 6px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 6px;
-}
-
-.token-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
-  box-shadow: 0 0 10px var(--neon-cyan);
-  transition: width 0.5s ease;
-}
-
-.token-info {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.7rem;
-  color: rgba(255,255,255,0.7);
-}
-
-/* Side Panel */
-.side-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.panel-box {
-  background: var(--bg-panel);
-  border: 1px solid rgba(0,255,255,0.4);
-  border-radius: 4px;
-  padding: 15px;
-}
-
-.panel-title {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--neon-cyan);
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(0,255,255,0.2);
-}
-
-/* Topology SVG */
-.topology-svg {
-  width: 100%;
-  height: 200px;
-  background: rgba(0, 20, 30, 0.5);
-  border-radius: 4px;
-}
-
-/* Log container */
-.log-container {
-  height: 200px;
-  overflow-y: auto;
-  background: rgba(0, 20, 30, 0.5);
-  border-radius: 4px;
-  padding: 10px;
-  font-size: 0.75rem;
-  color: rgba(0,255,255,0.8);
-}
-
-.log-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.log-container::-webkit-scrollbar-thumb {
-  background: rgba(0,255,255,0.5);
-}
-
-.log-entry {
-  margin-bottom: 4px;
-  display: flex;
-  gap: 10px;
-}
-
-.log-time {
-  color: var(--neon-amber);
-}
-
-.log-agent {
-  color: var(--neon-magenta);
-  min-width: 60px;
-}
-
-/* Heatmap */
-.heatmap-container canvas {
-  width: 100%;
-  height: 120px;
-  background: rgba(0,20,30,0.5);
-  border: 1px solid rgba(0,255,255,0.3);
-}
-
-/* Modal */
-.modal {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.9);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 10000;
-  backdrop-filter: blur(5px);
-}
-
-.modal.active {
-  display: flex;
-}
-
-.modal-content {
-  background: var(--bg-panel);
-  border: 2px solid var(--neon-cyan);
-  border-radius: 8px;
-  width: 90%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 0 50px rgba(0,255,255,0.5);
-  position: relative;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid rgba(0,255,255,0.3);
-}
-
-.modal-title {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--neon-cyan);
-  text-shadow: 0 0 10px var(--neon-cyan);
-}
-
-.close-btn {
-  background: transparent;
-  border: 1px solid var(--neon-cyan);
-  color: var(--neon-cyan);
-  padding: 6px 12px;
-  cursor: pointer;
-  font-family: inherit;
-  transition: all 0.3s;
-}
-
-.close-btn:hover {
-  background: var(--neon-cyan);
-  color: var(--bg-dark);
-}
-
-.modal-close {
-  position: absolute;
-  top: 15px;
-  right: 60px;
-  font-size: 1.5rem;
-  color: var(--neon-cyan);
-  cursor: pointer;
-}
-
-.modal-body {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 15px;
-}
-
-.chart-box {
-  background: rgba(0,20,30,0.5);
-  padding: 12px;
-  border-radius: 4px;
-  border: 1px solid rgba(0,255,255,0.2);
-}
-
-.chart-title {
-  font-size: 0.8rem;
-  color: var(--neon-cyan);
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-.chart-canvas {
-  width: 100%;
-  height: 120px;
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(0,255,255,0.3);
-}
-
-/* Settings Modal */
-#settings-modal .modal-content {
-  max-width: 500px;
-}
-
-.setting-row {
-  margin-bottom: 18px;
-}
-
-.setting-row label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--neon-cyan);
-  margin-bottom: 6px;
-  font-size: 0.9rem;
-}
-
-.setting-row input[type="number"] {
-  width: 70px;
-  background: rgba(0,255,255,0.1);
-  border: 1px solid var(--neon-cyan);
-  color: var(--neon-cyan);
-  padding: 6px 8px;
-  border-radius: 4px;
-  font-family: inherit;
-  text-align: center;
-}
-
-.setting-row input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--neon-cyan);
-}
-
-/* Alert Badge */
-#alert-badge {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: rgba(255,9,83,0.9);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 4px;
-  font-weight: 700;
-  border: 2px solid var(--neon-red);
-  box-shadow: 0 0 20px var(--neon-red);
-  display: none;
-  z-index: 9999;
-  animation: alertPulse 0.8s ease-in-out infinite;
-}
-
-@keyframes alertPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-/* Responsive */
-@media (max-width: 1200px) {
-  .main-layout { grid-template-columns: 1fr; }
-  .agents-grid { grid-template-columns: repeat(4, 1fr); }
-}
-@media (max-width: 1100px) { .agents-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 900px) { .agents-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 600px) {
-  .agents-grid { grid-template-columns: 1fr ); }
-  .modal-body { grid-template-columns: 1fr; }
-}
-
-/* Scrollbar */
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: rgba(0,255,255,0.1); }
-::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--neon-magenta); }
-
+    :root {
+      --bg: #050505;
+      --card-bg: rgba(10, 15, 20, 0.8);
+      --neon-cyan: #00ffff;
+      --neon-magenta: #ff00ff;
+      --neon-amber: #ffaa00;
+      --neon-red: #ff0953;
+      --neon-green: #00ff88;
+      --line-color: rgba(0, 255, 255, 0.2);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden; min-height: 100vh; padding: 20px;
+      background-image: linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    body::after {
+      content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
+      pointer-events: none; z-index: 9999;
+    }
+    .corner { position: fixed; width: 40px; height: 40px; border: 2px solid var(--neon-cyan); pointer-events: none; opacity: 0.5; }
+    .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+    .corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+    .corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+    .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px; padding: 10px 20px;
+      background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; position: relative;
+    }
+    .header::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); box-shadow: 0 0 10px var(--neon-cyan);
+    }
+    .title {
+      font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900;
+      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 20px rgba(0,255,255,0.5); letter-spacing: 3px;
+    }
+    .subtitle { color: var(--neon-cyan); font-size: 0.7rem; opacity: 0.7; letter-spacing: 2px; }
+    .system-bar {
+      display: flex; gap: 30px; margin-bottom: 20px; padding: 12px 20px;
+      background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px;
+    }
+    .sys-item { display: flex; align-items: center; gap: 10px; }
+    .sys-label { color: var(--neon-cyan); font-size: 0.75rem; text-transform: uppercase; }
+    .sys-value { font-family: 'Orbitron', monospace; font-size: 1rem; color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
+    .progress-mini { width: 100px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+    .progress-mini-fill { height: 100%; background: var(--neon-green); transition: width 0.5s; }
+    .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
+    .agents-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 1200px) { .agents-grid { grid-template-columns: repeat(3, 1fr); } .main-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .agents-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .agents-grid { grid-template-columns: 1fr; } }
+    .agent-card {
+      background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; padding: 15px;
+      position: relative; cursor: pointer; transition: all 0.3s; overflow: hidden;
+    }
+    .agent-card::before {
+      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 2px; background: var(--neon-cyan);
+      animation: scan 3s linear infinite;
+    }
+    @keyframes scan { 0% { left: -100%; } 100% { left: 100%; } }
+    .agent-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(0,255,255,0.2); border-color: var(--neon-cyan); }
+    .agent-card.wall-g { border-top: 2px solid #ff6b9d; }
+    .agent-card.wall-c { border-top: 2px solid var(--neon-cyan); }
+    .agent-card.wall-e { border-top: 2px solid var(--neon-green); }
+    .agent-card.wall-r { border-top: 2px solid #ffab00; }
+    .agent-card.wall-a { border-top: 2px solid #e040fb; }
+    .agent-card.wall-b { border-top: 2px solid #ff5252; }
+    .agent-card.wall-p { border-top: 2px solid #40c4ff; }
+    .agent-card.wall-x { border-top: 2px solid #b388ff; }
+    .agent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .agent-name { font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700; color: var(--neon-cyan); }
+    .agent-status { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: rgba(0,255,255,0.1); color: var(--neon-green); border: 1px solid var(--neon-cyan); }
+    .agent-status.idle { color: var(--neon-amber); border-color: var(--neon-amber); background: rgba(255,170,0,0.1); }
+    .agent-status.highload { color: var(--neon-red); border-color: var(--neon-red); background: rgba(255,9,83,0.1); animation: blink 1s infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    .agent-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.75rem; color: #aaa; }
+    .metric { display: flex; flex-direction: column; }
+    .metric-label { color: #666; font-size: 0.65rem; text-transform: uppercase; }
+    .metric-value { color: var(--neon-cyan); font-family: 'Orbitron', monospace; }
+    .token-bar { grid-column: 1 / -1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-top: 4px; overflow: hidden; position: relative; }
+    .token-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); position: relative; }
+    .token-fill::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      animation: shimmer 2s infinite;
+    }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    .side-panel { display: flex; flex-direction: column; gap: 20px; }
+    .panel-box { background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; padding: 15px; }
+    .panel-title { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--neon-magenta); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .topology-svg { width: 100%; height: 200px; background: rgba(0,0,0,0.3); border-radius: 4px; }
+    .log-container { max-height: 200px; overflow-y: auto; font-size: 0.7rem; color: #aaa; }
+    .log-entry { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 8px; }
+    .log-time { color: var(--neon-cyan); opacity: 0.7; }
+    .log-agent { color: var(--neon-magenta); font-weight: bold; }
+    .log-msg { color: #ccc; }
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--bg); border: 1px solid var(--neon-cyan); border-radius: 8px; width: 90%; max-width: 1200px; max-height: 90vh; overflow: auto; box-shadow: 0 0 50px rgba(0,255,255,0.3); position: relative;
+    }
+    .modal-close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; color: var(--neon-cyan); cursor: pointer; z-index: 10; }
+    .modal-header { padding: 20px; border-bottom: 1px solid var(--line-color); display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); }
+    .close-btn { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 16px; cursor: pointer; font-family: 'Orbitron', monospace; transition: all 0.3s; }
+    .close-btn:hover { background: var(--neon-cyan); color: #000; }
+    .modal-body { padding: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .modal-body { grid-template-columns: 1fr; } }
+    .chart-box { background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; padding: 15px; height: 300px; position: relative; }
+    .chart-title { color: var(--neon-magenta); font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; }
+    .chart-canvas { width: 100%; height: calc(100% - 30px); background: rgba(0,0,0,0.3); border: 1px solid rgba(0,255,255,0.2); border-radius: 4px; }
+    .alert-badge {
+      position: fixed; top: 20px; right: 20px; z-index: 9999;
+      background: var(--neon-red); color: #fff; padding: 10px 20px; border-radius: 4px;
+      font-family: 'Orbitron', monospace; font-size: 0.8rem; animation: alertPulse 1s infinite;
+      display: none;
+    }
+    .alert-badge.active { display: block; }
+    @keyframes alertPulse { 0%,100%{box-shadow:0 0 10px var(--neon-red)} 50%{box-shadow:0 0 20px var(--neon-red)} }
   </style>
 </head>
 <body>
@@ -554,7 +170,8 @@ body::after {
     <div class="sys-item">
       <span class="sys-label">DISK</span>
       <span class="sys-value" id="sys-disk">--</span>
-    </div>
+        <button id="settings-btn" style="background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);padding:8px 12px;margin-left:15px;cursor:pointer;font-family:'Orbitron',monospace;border-radius:4px;" onclick="openSettings()">⚙️</button>
+  </div>
   </div>
 
   <div class="main-layout">
@@ -566,7 +183,12 @@ body::after {
       <div class="panel-box">
         <div class="panel-title">🌐 NETWORK TOPOLOGY</div>
         <svg class="topology-svg" id="topology"></svg>
+    
+      <div class="panel-box">
+        <div class="panel-title">🔥 24H LOAD HEATMAP</div>
+        <canvas class="heatmap-canvas" id="heatmap" width="260" height="120" style="width:100%;height:120px;background:rgba(0,0,0,0.3);border:1px solid rgba(0,255,255,0.2);border-radius:4px;"></canvas>
       </div>
+  </div>
 
       <div class="panel-box">
         <div class="panel-title">📋 ACTIVITY LOG</div>
@@ -605,11 +227,52 @@ body::after {
     const ALERT_THRESHOLD = 80; // token usage % to trigger alert
     
     let agents = {};
+    let systemData = {};
     let topologyAnimation;
     let alertSound = null;
 
     // Fetch real data from API
-    async function fetchStatus() {
+        async function fetchStatus() {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const agentsData = data.agents || {};
+        const transformed = {};
+        for (const [key, agent] of Object.entries(agentsData)) {
+          transformed[key] = {
+            name: agent.name,
+            emoji: agent.emoji || '🤖',
+            status: agent.status,
+            sessions: agent.sessions,
+            tokens: agent.tokens || 0,
+            tokenLimit: agent.tokenLimit || 200000,
+            tokenPercent: agent.tokenPercent || Math.round((agent.tokens || 0) / (agent.tokenLimit || 200000) * 100),
+            cpu: agent.cpu || Math.floor(Math.random() * 30) + 5,
+            mem: agent.mem || (Math.random() * 4 + 1).toFixed(1),
+            net: agent.net || { down: (Math.random() * 5).toFixed(1), up: (Math.random() * 2).toFixed(1) },
+            skills: agent.skills || [],
+            tokenHistory: agent.tokenHistory || [],
+            hourlyLoad: agent.hourlyLoad || []
+          };
+        }
+        agents = transformed;
+        systemData = data.system || {};
+        renderAgents();
+        updateSystemBar();
+        checkAlerts();
+        const avgHourly = Object.values(agents).reduce((arr, a) => {
+          if (!arr.length) arr = a.hourlyLoad || [];
+          else arr = arr.map((v,i) => v + (a.hourlyLoad?.[i] || 0));
+          return arr;
+        }, []).map(v => Object.keys(agents).length > 0 ? Math.round(v / Object.keys(agents).length) : 0);
+        drawHeatmap(avgHourly);
+        addLog('System', 'Data refreshed from API');
+      } catch (e) {
+        console.error('Fetch failed:', e);
+        addLog('ERROR', 'Failed to fetch status: ' + e.message);
+      }
+    }sync function fetchStatus() {
       try {
         const res = await fetch(API_URL);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -674,18 +337,20 @@ body::after {
       grid.innerHTML = html;
     }
 
-    function updateSystemBar() {
-      // Simulated system-wide metrics (would be from real system monitoring)
-      const totalCpu = Object.values(agents).reduce((sum, a) => sum + a.cpu, 0);
-      const avgCpu = Math.round(totalCpu / Object.keys(agents).length);
-      const totalMem = Object.values(agents).reduce((sum, a) => sum + parseFloat(a.mem), 0);
-      const avgMem = (totalMem / Object.keys(agents).length).toFixed(1);
+        function updateSystemBar() {
+      const cpu = systemData.cpu || Math.round(Object.values(agents).reduce((sum, a) => sum + (a.cpu || 0), 0) / Math.max(1, Object.keys(agents).length));
+      const mem = (systemData.memory?.percent || Math.round(Object.values(agents).reduce((sum, a) => sum + parseFloat(a.mem || 0), 0) / Math.max(1, Object.keys(agents).length)));
+      const netRx = systemData.network?.rx || (Math.random()*10).toFixed(1);
+      const netTx = systemData.network?.tx || (Math.random()*5).toFixed(1);
+      const disk = systemData.disk?.percent || 68;
       
-      document.getElementById('sys-cpu').textContent = avgCpu + '%';
-      document.getElementById('cpu-bar').style.width = avgCpu + '%';
-      document.getElementById('sys-mem').textContent = avgMem + 'GB';
-      document.getElementById('mem-bar').style.width = Math.min(100, (avgMem / 16) * 100) + '%';
-      document.getElementById('sys-net').textContent = `↓${(Math.random()*10).toFixed(1)} ↑${(Math.random()*5).toFixed(1)} MB/s`;
+      document.getElementById('sys-cpu').textContent = cpu + '%';
+      document.getElementById('cpu-bar').style.width = cpu + '%';
+      document.getElementById('sys-mem').textContent = mem + '%';
+      document.getElementById('mem-bar').style.width = Math.min(100, mem) + '%';
+      document.getElementById('sys-net').textContent = `↓${netRx} ↑${netTx} MB/s`;
+      document.getElementById('sys-disk').textContent = disk + '%';
+    } ↑${(Math.random()*5).toFixed(1)} MB/s`;
       document.getElementById('sys-disk').textContent = '68%'; // placeholder
     }
 
@@ -805,7 +470,72 @@ body::after {
       document.getElementById('agent-modal').classList.add('active');
     }
 
-    function closeModal() {
+    
+    // Heatmap
+    function drawHeatmap(data) {
+      const canvas = document.getElementById('heatmap');
+      if (!canvas || !data || data.length === 0) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.offsetWidth;
+      const h = canvas.height = canvas.offsetHeight;
+      ctx.clearRect(0,0,w,h);
+      const cellW = w / 24;
+      const maxVal = Math.max(...data, 1);
+      data.forEach((val, i) => {
+        const pct = Math.min(100, Math.round((val / maxVal) * 100));
+        let r,g,b,a;
+        if (pct < 50) { r=0; g=255; b=136; a = 0.4 + (pct/50)*0.4; }
+        else if (pct < 80) { r=255; g=170; b=0; a = 0.4 + ((pct-50)/30)*0.4; }
+        else { r=255; g=9; b=83; a = 0.4 + ((pct-80)/20)*0.4; }
+        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+        ctx.fillRect(i*cellW, 0, cellW-1, h);
+      });
+      ctx.fillStyle = 'var(--neon-cyan)';
+      ctx.font = '10px JetBrains Mono';
+      ctx.textAlign = 'center';
+      for (let i = 0; i < 24; i++) {
+        ctx.fillText(i+'h', i*cellW + cellW/2, h - 4);
+      }
+    }
+
+    // Settings
+    let ALERT_THRESHOLD = 80;
+    let REFRESH_INTERVAL = 10;
+    let SOUND_ENABLED = false;
+    let refreshTimer;
+
+    function openSettings() {
+      document.getElementById('settings-modal').classList.add('active');
+      document.getElementById('alert-threshold').value = ALERT_THRESHOLD;
+      document.getElementById('refresh-interval').value = REFRESH_INTERVAL;
+      document.getElementById('sound-alert').checked = SOUND_ENABLED;
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').classList.remove('active');
+    }
+
+    function saveSettings() {
+      ALERT_THRESHOLD = parseInt(document.getElementById('alert-threshold').value) || 80;
+      REFRESH_INTERVAL = parseInt(document.getElementById('refresh-interval').value) || 10;
+      SOUND_ENABLED = document.getElementById('sound-alert').checked;
+      localStorage.setItem('dashboardSettings', JSON.stringify({ ALERT_THRESHOLD, REFRESH_INTERVAL, SOUND_ENABLED }));
+      closeSettings();
+      addLog('Settings', `Saved: threshold=${ALERT_THRESHOLD}, interval=${REFRESH_INTERVAL}s`);
+      clearInterval(refreshTimer);
+      refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
+    }
+
+    function loadSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('dashboardSettings') || '{}');
+        if (saved.ALERT_THRESHOLD) ALERT_THRESHOLD = saved.ALERT_THRESHOLD;
+        if (saved.REFRESH_INTERVAL) REFRESH_INTERVAL = saved.REFRESH_INTERVAL;
+        if (saved.SOUND_ENABLED !== undefined) SOUND_ENABLED = saved.SOUND_ENABLED;
+      } catch (e) {}
+    }
+
+function closeModal() {
       document.getElementById('agent-modal').classList.remove('active');
     }
 
@@ -817,16 +547,152 @@ body::after {
     }
 
     // Init
-    function init() {
+    
+    // Settings
+    let ALERT_THRESHOLD = 80;
+    let REFRESH_INTERVAL = 10;
+    let SOUND_ENABLED = false;
+
+    function openSettings() {
+      document.getElementById('settings-modal').classList.add('active');
+      document.getElementById('alert-threshold').value = ALERT_THRESHOLD;
+      document.getElementById('refresh-interval').value = REFRESH_INTERVAL;
+      document.getElementById('sound-alert').checked = SOUND_ENABLED;
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').classList.remove('active');
+    }
+
+    function saveSettings() {
+      ALERT_THRESHOLD = parseInt(document.getElementById('alert-threshold').value) || 80;
+      REFRESH_INTERVAL = parseInt(document.getElementById('refresh-interval').value) || 10;
+      SOUND_ENABLED = document.getElementById('sound-alert').checked;
+      localStorage.setItem('dashboardSettings', JSON.stringify({ ALERT_THRESHOLD, REFRESH_INTERVAL, SOUND_ENABLED }));
+      closeSettings();
+      addLog('Settings', `Saved: threshold=${ALERT_THRESHOLD}, interval=${REFRESH_INTERVAL}s`);
+      clearInterval(refreshTimer);
+      refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
+    }
+
+    function loadSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('dashboardSettings') || '{}');
+        if (saved.ALERT_THRESHOLD) ALERT_THRESHOLD = saved.ALERT_THRESHOLD;
+        if (saved.REFRESH_INTERVAL) REFRESH_INTERVAL = saved.REFRESH_INTERVAL;
+        if (saved.SOUND_ENABLED !== undefined) SOUND_ENABLED = saved.SOUND_ENABLED;
+      } catch (e) {}
+    }
+
+    let refreshTimer;
+
+function init() {
+      loadSettings();
       fetchStatus();
       updateClock();
       setInterval(updateClock, 1000);
+      refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
+      loadSettings();
+      refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
       setInterval(fetchStatus, 10000);
       setInterval(drawTopology, 5000);
       drawTopology();
     }
 
-    window.onload = init;
+    
+    // Heatmap rendering
+    function drawHeatmap(data) {
+      const canvas = document.getElementById('heatmap');
+      if (!canvas || !data || data.length === 0) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.offsetWidth;
+      const h = canvas.height = canvas.offsetHeight;
+      ctx.clearRect(0,0,w,h);
+      const cellW = w / 24;
+      const cellH = h;
+      
+      const maxVal = Math.max(...data, 1);
+      data.forEach((val, i) => {
+        const pct = Math.min(100, Math.round((val / maxVal) * 100));
+        let r,g,b,a;
+        if (pct < 50) {
+          r = 0; g = 255; b = 136; a = 0.4 + (pct/50)*0.4;
+        } else if (pct < 80) {
+          r = 255; g = 170; b = 0; a = 0.4 + ((pct-50)/30)*0.4;
+        } else {
+          r = 255; g = 9; b = 83; a = 0.4 + ((pct-80)/20)*0.4;
+        }
+        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+        ctx.fillRect(i*cellW, 0, cellW-1, cellH);
+      });
+      
+      ctx.fillStyle = "var(--neon-cyan)";
+      ctx.font = "10px JetBrains Mono";
+      ctx.textAlign = "center";
+      for (let i = 0; i < 24; i++) {
+        ctx.fillText(i+"h", i*cellW + cellW/2, h - 4);
+      }
+    }
+
+    // Settings handlers
+    function openSettings() {
+      document.getElementById('settings-modal').classList.add('active');
+      document.getElementById('alert-threshold').value = ALERT_THRESHOLD;
+      document.getElementById('refresh-interval').value = REFRESH_INTERVAL;
+      document.getElementById('sound-alert').checked = SOUND_ENABLED;
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').classList.remove('active');
+    }
+
+    function saveSettings() {
+      ALERT_THRESHOLD = parseInt(document.getElementById('alert-threshold').value) || 80;
+      REFRESH_INTERVAL = parseInt(document.getElementById('refresh-interval').value) || 10;
+      SOUND_ENABLED = document.getElementById('sound-alert').checked;
+      localStorage.setItem('dashboardSettings', JSON.stringify({ ALERT_THRESHOLD, REFRESH_INTERVAL, SOUND_ENABLED }));
+      closeSettings();
+      addLog('Settings', `Saved: threshold=${ALERT_THRESHOLD}, interval=${REFRESH_INTERVAL}s`);
+      clearInterval(refreshTimer);
+      refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
+    }
+
+    // Alert threshold check updated to use ALERT_THRESHOLD
+    // (already referencing global)
+
+window.onload = init;
   </script>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content" style="max-width:500px;">
+      <div class="modal-close" onclick="closeSettings()">&times;</div>
+      <div class="modal-header">
+        <div class="modal-title">⚙️ SETTINGS</div>
+        <button class="close-btn" onclick="closeSettings()">CLOSE</button>
+      </div>
+      <div class="modal-body" style="display:block;">
+        <div class="setting-row">
+          <label>
+            <span>ALERT THRESHOLD (%)</span>
+            <input type="number" id="alert-threshold" value="80" min="1" max="100">
+          </label>
+        </div>
+        <div class="setting-row">
+          <label>
+            <span>REFRESH INTERVAL (s)</span>
+            <input type="number" id="refresh-interval" value="10" min="3" max="60">
+          </label>
+        </div>
+        <div class="setting-row">
+          <label>
+            <span>ENABLE SOUND ALERTS</span>
+            <input type="checkbox" id="sound-alert">
+          </label>
+        </div>
+        <button class="close-btn" onclick="saveSettings()" style="width:100%;margin-top:10px;">SAVE</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
