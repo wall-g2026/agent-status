@@ -4,195 +4,138 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WALL TEAM // CYBERPUNK MONITOR</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #050505;
-      --card-bg: rgba(10, 15, 20, 0.8);
-      --neon-cyan: #00ffff;
-      --neon-magenta: #ff00ff;
-      --neon-amber: #ffaa00;
-      --neon-red: #ff0953;
-      --neon-green: #00ff88;
-      --line-color: rgba(0, 255, 255, 0.2);
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: var(--bg); color: #fff; font-family: 'JetBrains Mono', monospace;
-      overflow-x: hidden; min-height: 100vh; padding: 20px;
-      background-image: linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-    }
-    body::after {
-      content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 2px);
-      pointer-events: none; z-index: 9999;
-    }
-    .corner { position: fixed; width: 40px; height: 40px; border: 2px solid var(--neon-cyan); pointer-events: none; opacity: 0.5; }
-    .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
-    .corner-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
-    .corner-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
-    .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
-    .header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 20px; padding: 10px 20px;
-      background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; position: relative;
-    }
-    .header::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); box-shadow: 0 0 10px var(--neon-cyan);
-    }
-    .title {
-      font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900;
-      background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 20px rgba(0,255,255,0.5); letter-spacing: 3px;
-    }
-    .subtitle { color: var(--neon-cyan); font-size: 0.7rem; opacity: 0.7; letter-spacing: 2px; }
-    .system-bar {
-      display: flex; gap: 30px; margin-bottom: 20px; padding: 12px 20px;
-      background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px;
-    }
-    .sys-item { display: flex; align-items: center; gap: 10px; }
-    .sys-label { color: var(--neon-cyan); font-size: 0.75rem; text-transform: uppercase; }
-    .sys-value { font-family: 'Orbitron', monospace; font-size: 1rem; color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
-    .progress-mini { width: 100px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-    .progress-mini-fill { height: 100%; background: var(--neon-green); transition: width 0.5s; }
-    .main-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
-    .agents-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-    @media (max-width: 1200px) { .agents-grid { grid-template-columns: repeat(3, 1fr); } .main-layout { grid-template-columns: 1fr; } }
-    @media (max-width: 900px) { .agents-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 600px) { .agents-grid { grid-template-columns: 1fr; } }
-    .agent-card {
-      background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; padding: 15px;
-      position: relative; cursor: pointer; transition: all 0.3s; overflow: hidden;
-    }
-    .agent-card::before {
-      content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 2px; background: var(--neon-cyan);
-      animation: scan 3s linear infinite;
-    }
-    @keyframes scan { 0% { left: -100%; } 100% { left: 100%; } }
-    .agent-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(0,255,255,0.2); border-color: var(--neon-cyan); }
-    .agent-card.wall-g { border-top: 2px solid #ff6b9d; }
-    .agent-card.wall-c { border-top: 2px solid var(--neon-cyan); }
-    .agent-card.wall-e { border-top: 2px solid var(--neon-green); }
-    .agent-card.wall-r { border-top: 2px solid #ffab00; }
-    .agent-card.wall-a { border-top: 2px solid #e040fb; }
-    .agent-card.wall-b { border-top: 2px solid #ff5252; }
-    .agent-card.wall-p { border-top: 2px solid #40c4ff; }
-    .agent-card.wall-x { border-top: 2px solid #b388ff; }
-    .agent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-    .agent-name { font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 700; color: var(--neon-cyan); }
-    .agent-status { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; background: rgba(0,255,255,0.1); color: var(--neon-green); border: 1px solid var(--neon-cyan); }
-    .agent-status.idle { color: var(--neon-amber); border-color: var(--neon-amber); background: rgba(255,170,0,0.1); }
-    .agent-status.highload { color: var(--neon-red); border-color: var(--neon-red); background: rgba(255,9,83,0.1); animation: blink 1s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
-    .agent-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.75rem; color: #aaa; }
-    .metric { display: flex; flex-direction: column; }
-    .metric-label { color: #666; font-size: 0.65rem; text-transform: uppercase; }
-    .metric-value { color: var(--neon-cyan); font-family: 'Orbitron', monospace; }
-    .token-bar { grid-column: 1 / -1; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-top: 4px; overflow: hidden; position: relative; }
-    .token-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta)); position: relative; }
-    .token-fill::after {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-      animation: shimmer 2s infinite;
-    }
-    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-    .side-panel { display: flex; flex-direction: column; gap: 20px; }
-    .panel-box { background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; padding: 15px; }
-    .panel-title { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--neon-magenta); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
-    .topology-svg { width: 100%; height: 200px; background: rgba(0,0,0,0.3); border-radius: 4px; }
-    .log-container { max-height: 200px; overflow-y: auto; font-size: 0.7rem; color: #aaa; }
-    .log-entry { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 8px; }
-    .log-time { color: var(--neon-cyan); opacity: 0.7; }
-    .log-agent { color: var(--neon-magenta); font-weight: bold; }
-    .log-msg { color: #ccc; }
-    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.9); z-index: 10000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-    .modal.active { display: flex; }
-    .modal-content {
-      background: var(--bg); border: 1px solid var(--neon-cyan); border-radius: 8px; width: 90%; max-width: 1200px; max-height: 90vh; overflow: auto; box-shadow: 0 0 50px rgba(0,255,255,0.3); position: relative;
-    }
-    .modal-close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; color: var(--neon-cyan); cursor: pointer; z-index: 10; }
-    .modal-header { padding: 20px; border-bottom: 1px solid var(--line-color); display: flex; justify-content: space-between; align-items: center; }
-    .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); }
-    .close-btn { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 16px; cursor: pointer; font-family: 'Orbitron', monospace; transition: all 0.3s; }
-    .close-btn:hover { background: var(--neon-cyan); color: #000; }
-    .modal-body { padding: 20px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-    @media (max-width: 900px) { .modal-body { grid-template-columns: 1fr; } }
-    .chart-box { background: var(--card-bg); border: 1px solid var(--line-color); border-radius: 4px; padding: 15px; height: 300px; position: relative; }
-    .chart-title { color: var(--neon-magenta); font-size: 0.85rem; margin-bottom: 10px; text-transform: uppercase; }
-    .chart-canvas { width: 100%; height: calc(100% - 30px); background: rgba(0,0,0,0.3); border: 1px solid rgba(0,255,255,0.2); border-radius: 4px; }
-    .alert-badge {
-      position: fixed; top: 20px; right: 20px; z-index: 9999;
-      background: var(--neon-red); color: #fff; padding: 10px 20px; border-radius: 4px;
-      font-family: 'Orbitron', monospace; font-size: 0.8rem; animation: alertPulse 1s infinite;
-      display: none;
-    }
-    .alert-badge.active { display: block; }
-    @keyframes alertPulse { 0%,100%{box-shadow:0 0 10px var(--neon-red)} 50%{box-shadow:0 0 20px var(--neon-red)} }
+/* PURE CYBERPUNK DASHBOARD */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+:root{--neon-cyan:#00ffff;--neon-magenta:#ff00ff;--neon-amber:#ffaa00;--neon-red:#ff0953;--neon-green:#00ff88;--bg-dark:#050505;--card-bg:rgba(0,10,15,0.85);--line-color:rgba(0,255,255,0.15);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-dark);color:var(--neon-cyan);font-family:'JetBrains Mono',monospace;min-height:100vh;padding:20px;overflow-x:hidden;position:relative;}
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:linear-gradient(var(--line-color) 1px,transparent 1px),linear-gradient(90deg,var(--line-color) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.15),rgba(0,0,0,0.15) 1px,transparent 1px,transparent 2px);pointer-events:none;z-index:9999;opacity:0.6;}
+.container{max-width:1600px;margin:0 auto;position:relative;z-index:1;}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding:15px 25px;background:var(--card-bg);border:1px solid var(--neon-cyan);border-radius:4px;box-shadow:0 0 20px rgba(0,255,255,0.3);}
+.title{font-size:1.5rem;font-weight:700;color:var(--neon-cyan);text-shadow:0 0 10px var(--neon-cyan);letter-spacing:2px;}
+.time-display{text-align:center;margin-bottom:20px;}
+.time{font-family:'Orbitron',monospace;font-size:1.8rem;color:var(--neon-amber);text-shadow:0 0 10px var(--neon-amber);}
+.date{color:var(--neon-cyan);opacity:0.7;font-size:0.8rem;}
+.system-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:20px;}
+.sys-item{background:var(--card-bg);border:1px solid var(--line-color);padding:12px 15px;border-radius:4px;}
+.sys-label{color:var(--neon-cyan);font-size:0.75rem;text-transform:uppercase;margin-bottom:6px;opacity:0.8;}
+.sys-value{font-family:'Orbitron',monospace;font-size:1.1rem;font-weight:700;color:var(--neon-green);text-shadow:0 0 8px var(--neon-green);}
+.progress-mini{width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden;margin-top:6px;}
+.progress-mini-fill{height:100%;background:var(--neon-green);box-shadow:0 0 8px var(--neon-green);transition:width 0.5s ease;}
+.main-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;}
+.agents-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;}
+@media(max-width:1400px){.agents-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:1100px){.agents-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:700px){.agents-grid{grid-template-columns:1fr;}}
+.agent-card{background:var(--card-bg);border:1px solid var(--line-color);border-radius:4px;padding:15px;position:relative;cursor:pointer;transition:all 0.3s ease;overflow:hidden;}
+.agent-card:hover{border-color:var(--neon-cyan);box-shadow:0 0 20px rgba(0,255,255,0.4);transform:translateY(-2px);}
+.agent-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--neon-cyan),transparent);animation:scan 2s linear infinite;}
+@keyframes scan{0%{transform:translateX(-100%);}100%{transform:translateX(100%);}}
+.agent-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.agent-name{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:700;color:var(--neon-cyan);text-shadow:0 0 8px var(--neon-cyan);}
+.agent-status{font-size:0.7rem;padding:2px 8px;border-radius:10px;background:rgba(0,255,255,0.1);color:var(--neon-green);border:1px solid var(--neon-cyan);}
+.agent-status.highload{background:rgba(255,9,83,0.3);color:var(--neon-red);border-color:var(--neon-red);animation:pulse 1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.5;}}
+.agent-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;font-size:0.75rem;color:#aaa;}
+.metric{display:flex;flex-direction:column;}
+.metric-label{color:#666;font-size:0.65rem;text-transform:uppercase;margin-bottom:2px;}
+.metric-value{color:var(--neon-cyan);font-family:'Orbitron',monospace;}
+.token-bar{grid-column:1/-1;height:6px;background:rgba(255,255,255,0.05);border-radius:3px;margin-top:4px;overflow:hidden;position:relative;}
+.token-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-magenta));position:relative;box-shadow:0 0 10px var(--neon-cyan);transition:width 0.5s ease;}
+.token-info{display:flex;justify-content:space-between;font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:6px;}
+.side-panel{display:flex;flex-direction:column;gap:20px;}
+.panel-box{background:var(--card-bg);border:1px solid var(--line-color);border-radius:4px;padding:15px;}
+.panel-title{font-family:'Orbitron',sans-serif;font-size:0.9rem;color:var(--neon-magenta);margin-bottom:12px;text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;border-bottom:1px solid var(--line-color);}
+.topology-svg{width:100%;height:200px;background:rgba(0,0,0,0.3);border-radius:4px;}
+.log-container{height:200px;overflow-y:auto;background:rgba(0,0,0,0.3);border-radius:4px;padding:10px;font-size:0.75rem;color:var(--neon-cyan);opacity:0.9;}
+.log-container::-webkit-scrollbar{width:6px;}
+.log-container::-webkit-scrollbar-thumb{background:var(--neon-cyan);border-radius:4px;}
+.log-entry{margin-bottom:4px;display:flex;gap:10px;}
+.log-time{color:var(--neon-amber);}
+.log-agent{color:var(--neon-magenta);min-width:60px;}
+.heatmap-canvas{width:100%;height:120px;background:rgba(0,0,0,0.3);border:1px solid var(--line-color);border-radius:4px;display:block;}
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);display:none;align-items:center;justify-content:center;z-index:10000;backdrop-filter:blur(5px);}
+.modal.active{display:flex;}
+.modal-content{background:var(--card-bg);border:2px solid var(--neon-cyan);border-radius:8px;width:90%;max-width:700px;max-height:90vh;overflow-y:auto;box-shadow:0 0 50px rgba(0,255,255,0.5);position:relative;}
+.modal-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;border-bottom:1px solid var(--line-color);}
+.modal-title{font-size:1.2rem;font-weight:700;color:var(--neon-cyan);text-shadow:0 0 10px var(--neon-cyan);}
+.modal-close{position:absolute;top:15px;right:60px;font-size:1.5rem;color:var(--neon-cyan);cursor:pointer;}
+.close-btn{background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);padding:6px 12px;cursor:pointer;font-family:inherit;transition:all 0.3s;}
+.close-btn:hover{background:var(--neon-cyan);color:var(--bg-dark);}
+.modal-body{padding:20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:15px;}
+.chart-box{background:rgba(0,0,0,0.3);padding:12px;border-radius:4px;border:1px solid var(--line-color);}
+.chart-title{font-size:0.8rem;color:var(--neon-cyan);margin-bottom:10px;text-align:center;}
+.chart-canvas{width:100%;height:120px;background:rgba(0,0,0,0.3);border:1px solid var(--line-color);}
+#settings-modal .modal-content{max-width:500px;}
+.setting-row{margin-bottom:18px;}
+.setting-row label{display:flex;justify-content:space-between;align-items:center;color:var(--neon-cyan);margin-bottom:6px;font-size:0.9rem;}
+.setting-row input[type="number"]{width:70px;background:rgba(0,255,255,0.1);border:1px solid var(--neon-cyan);color:var(--neon-cyan);padding:6px 8px;border-radius:4px;font-family:inherit;text-align:center;}
+.setting-row input[type="checkbox"]{width:18px;height:18px;accent-color:var(--neon-cyan);}
+#alert-badge{position:fixed;top:20px;right:20px;background:rgba(255,9,83,0.9);color:#fff;padding:12px 20px;border-radius:4px;font-weight:700;border:2px solid var(--neon-red);box-shadow:0 0 20px var(--neon-red);display:none;z-index:9999;animation:alertPulse 0.8s ease-in-out infinite;}
+@keyframes alertPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+@media(max-width:1200px){.main-layout{grid-template-columns:1fr;}.agents-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:1100px){.agents-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:900px){.agents-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.agents-grid{grid-template-columns:1fr;}.modal-body{grid-template-columns:1fr;}}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-track{background:rgba(0,255,255,0.1);}
+::-webkit-scrollbar-thumb{background:var(--neon-cyan);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:var(--neon-magenta);}
   </style>
 </head>
 <body>
-  <div class="corner corner-tl"></div>
-  <div class="corner corner-tr"></div>
-  <div class="corner corner-bl"></div>
-  <div class="corner corner-br"></div>
-
-  <div class="alert-badge" id="alert-badge">⚠️ HIGH LOAD DETECTED</div>
-
-  <div class="header">
-    <div>
+  <div class="container">
+    <div class="header">
       <div class="title">✦ WALL TEAM MONITOR ✦</div>
-      <div class="subtitle">REAL-TIME CYBERPUNK DASHBOARD V2.0</div>
-    </div>
-    <div style="text-align: right;">
-      <div style="color: var(--neon-cyan); font-size: 0.8rem;" id="clock">00:00:00</div>
-      <div style="color: #666; font-size: 0.7rem;" id="date">2026-03-01</div>
-    </div>
-  </div>
-
-  <div class="system-bar">
-    <div class="sys-item">
-      <span class="sys-label">CPU</span>
-      <span class="sys-value" id="sys-cpu">--</span>
-      <div class="progress-mini"><div class="progress-mini-fill" id="cpu-bar" style="width: 0%; background: var(--neon-green);"></div></div>
-    </div>
-    <div class="sys-item">
-      <span class="sys-label">MEM</span>
-      <span class="sys-value" id="sys-mem">--</span>
-      <div class="progress-mini"><div class="progress-mini-fill" id="mem-bar" style="width: 0%; background: var(--neon-cyan);"></div></div>
-    </div>
-    <div class="sys-item">
-      <span class="sys-label">NET</span>
-      <span class="sys-value" id="sys-net">--</span>
-    </div>
-    <div class="sys-item">
-      <span class="sys-label">DISK</span>
-      <span class="sys-value" id="sys-disk">--</span>
-        <button id="settings-btn" style="background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);padding:8px 12px;margin-left:15px;cursor:pointer;font-family:Orbitron,monospace;border-radius:4px;" onclick="openSettings()">⚙️</button>
-  </div>
-  </div>
-
-  <div class="main-layout">
-    <div class="agents-grid" id="agents-grid">
-      <!-- Agent cards rendered by JS -->
-    </div>
-
-    <div class="side-panel">
-      <div class="panel-box">
-        <div class="panel-title">🌐 NETWORK TOPOLOGY</div>
-        <svg class="topology-svg" id="topology"></svg>
-    
-      <div class="panel-box">
-        <div class="panel-title">🔥 24H LOAD HEATMAP</div>
-        <canvas class="heatmap-canvas" id="heatmap" width="260" height="120" style="width:100%;height:120px;background:rgba(0,0,0,0.3);border:1px solid rgba(0,255,255,0.2);border-radius:4px;"></canvas>
+      <div style="display:flex;align-items:center;">
+        <div class="time-display">
+          <div class="time" id="clock">00:00:00</div>
+          <div class="date" id="date">Loading...</div>
+        </div>
+        <button id="settings-btn" style="background:transparent;border:1px solid var(--neon-cyan);color:var(--neon-cyan);padding:8px 12px;margin-left:15px;cursor:pointer;font-family:'Orbitron',monospace;border-radius:4px;" onclick="openSettings()">⚙️</button>
       </div>
-  </div>
+    </div>
 
-      <div class="panel-box">
-        <div class="panel-title">📋 ACTIVITY LOG</div>
-        <div class="log-container" id="log-container"></div>
+    <div class="system-bar">
+      <div class="sys-item">
+        <span class="sys-label">CPU</span>
+        <span class="sys-value" id="sys-cpu">--</span>
+        <div class="progress-mini"><div class="progress-mini-fill" id="cpu-bar" style="width:0%;background:var(--neon-green);"></div></div>
+      </div>
+      <div class="sys-item">
+        <span class="sys-label">MEM</span>
+        <span class="sys-value" id="sys-mem">--</span>
+        <div class="progress-mini"><div class="progress-mini-fill" id="mem-bar" style="width:0%;background:var(--neon-cyan);"></div></div>
+      </div>
+      <div class="sys-item">
+        <span class="sys-label">NET</span>
+        <span class="sys-value" id="sys-net">--</span>
+      </div>
+      <div class="sys-item">
+        <span class="sys-label">DISK</span>
+        <span class="sys-value" id="sys-disk">--</span>
+      </div>
+    </div>
+
+    <div class="main-layout">
+      <div class="agents-grid" id="agents-grid"></div>
+
+      <div class="side-panel">
+        <div class="panel-box">
+          <div class="panel-title">🌐 NETWORK TOPOLOGY</div>
+          <svg class="topology-svg" id="topology"></svg>
+        </div>
+        <div class="panel-box">
+          <div class="panel-title">🔥 24H LOAD HEATMAP</div>
+          <canvas class="heatmap-canvas" id="heatmap" width="260" height="120"></canvas>
+        </div>
+        <div class="panel-box">
+          <div class="panel-title">📋 ACTIVITY LOG</div>
+          <div class="log-container" id="log-container"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -207,17 +150,40 @@
       </div>
       <div class="modal-body">
         <div class="chart-box">
-          <div class="chart-title">Token Usage (Recent Sessions)</div>
+          <div class="chart-title">Token Usage</div>
           <canvas class="chart-canvas" id="chart-token"></canvas>
         </div>
         <div class="chart-box">
-          <div class="chart-title">Session Load (24h)</div>
+          <div class="chart-title">Session Load</div>
           <canvas class="chart-canvas" id="chart-session"></canvas>
         </div>
         <div class="chart-box">
-          <div class="chart-title">Resource Usage (CPU/MEM)</div>
+          <div class="chart-title">Resource Usage</div>
           <canvas class="chart-canvas" id="chart-resource"></canvas>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-close" onclick="closeSettings()">&times;</div>
+      <div class="modal-header">
+        <div class="modal-title">⚙️ SETTINGS</div>
+        <button class="close-btn" onclick="closeSettings()">CLOSE</button>
+      </div>
+      <div class="modal-body" style="display:block;">
+        <div class="setting-row">
+          <label><span>ALERT THRESHOLD (%)</span><input type="number" id="alert-threshold" value="80" min="1" max="100"></label>
+        </div>
+        <div class="setting-row">
+          <label><span>REFRESH INTERVAL (s)</span><input type="number" id="refresh-interval" value="10" min="3" max="60"></label>
+        </div>
+        <div class="setting-row">
+          <label><span>ENABLE SOUND ALERTS</span><input type="checkbox" id="sound-alert"></label>
+        </div>
+        <button class="close-btn" onclick="saveSettings()" style="width:100%;margin-top:10px;">SAVE</button>
       </div>
     </div>
   </div>
@@ -230,8 +196,6 @@
     let ALERT_THRESHOLD = 80;
     let REFRESH_INTERVAL = 10;
     let SOUND_ENABLED = false;
-    
-    // Fetch
     async function fetchStatus() {
       try {
         const res = await fetch(API_URL);
@@ -272,8 +236,6 @@
         addLog('ERROR', e.message);
       }
     }
-    
-    // Render agents grid
     function renderAgents() {
       const grid = document.getElementById('agents-grid');
       let html = '';
@@ -302,13 +264,11 @@
       }
       grid.innerHTML = html;
     }
-    
-    // Update system bar
     function updateSystemBar() {
       const cpu = systemData.cpu || Math.round(Object.values(agents).reduce((sum, a) => sum + (a.cpu || 0), 0) / Math.max(1, Object.keys(agents).length));
       const mem = systemData.memory?.percent || Math.round(Object.values(agents).reduce((sum, a) => sum + parseFloat(a.mem || 0), 0) / Math.max(1, Object.keys(agents).length));
-      const netRx = systemData.network?.rx || (Math.random() * 10).toFixed(1);
-      const netTx = systemData.network?.tx || (Math.random() * 5).toFixed(1);
+      const netRx = systemData.network?.rx || (Math.random()*10).toFixed(1);
+      const netTx = systemData.network?.tx || (Math.random()*5).toFixed(1);
       const disk = systemData.disk?.percent || 68;
       document.getElementById('sys-cpu').textContent = cpu + '%';
       document.getElementById('cpu-bar').style.width = cpu + '%';
@@ -317,24 +277,19 @@
       document.getElementById('sys-net').textContent = `↓${netRx} ↑${netTx} MB/s`;
       document.getElementById('sys-disk').textContent = disk + '%';
     }
-    
-    // Alerts
     function checkAlerts() {
       const badge = document.getElementById('alert-badge');
       const high = Object.values(agents).some(a => a.tokenPercent > ALERT_THRESHOLD);
-      badge.style.display = high ? 'block' : 'none';
+      if (badge) badge.style.display = high ? 'block' : 'none';
     }
-    
-    // Log
     function addLog(agent, msg) {
       const container = document.getElementById('log-container');
+      if (!container) return;
       const now = new Date();
       const time = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
       container.innerHTML += `<div class="log-entry"><span class="log-time">${time}</span><span class="log-agent">${agent}</span><span>${msg}</span></div>`;
       container.scrollTop = container.scrollHeight;
     }
-    
-    // Heatmap
     function drawHeatmap(data) {
       const canvas = document.getElementById('heatmap');
       if (!canvas || !data || data.length === 0) return;
@@ -360,7 +315,71 @@
         ctx.fillText(i+'h', i*cellW + cellW/2, h - 4);
       }
     }
-    
+    function drawTopology() {
+      const svg = document.getElementById('topology');
+      if (!svg) return;
+      const w = svg.offsetWidth || 300;
+      const h = 200;
+      svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+      const nodes = Object.keys(agents);
+      if (nodes.length === 0) return;
+      const positions = {};
+      const centerX = w/2, centerY = h/2;
+      const radius = Math.min(w,h)/3;
+      nodes.forEach((node, i) => {
+        const angle = (i / nodes.length) * Math.PI * 2 - Math.PI/2;
+        positions[node] = { x: centerX + Math.cos(angle) * radius, y: centerY + Math.sin(angle) * radius };
+      });
+      let svgContent = '';
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i+1; j < nodes.length; j++) {
+          const a = positions[nodes[i]], b = positions[nodes[j]];
+          svgContent += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="rgba(0,255,255,0.2)" stroke-width="1" />`;
+        }
+      }
+      nodes.forEach(node => {
+        const pos = positions[node];
+        const agent = agents[node];
+        const color = agent && agent.tokenPercent > 80 ? 'var(--neon-red)' : 'var(--neon-cyan)';
+        svgContent += `<circle cx="${pos.x}" cy="${pos.y}" r="12" fill="${color}" fill-opacity="0.3" stroke="${color}" stroke-width="2"><animate attributeName="r" values="12;14;12" dur="2s" repeatCount="indefinite"/></circle>`;
+        svgContent += `<text x="${pos.x}" y="${pos.y + 24}" text-anchor="middle" fill="${color}" font-size="8" font-family="JetBrains Mono">${node}</text>`;
+      });
+      svg.innerHTML = svgContent;
+    }
+    function openModal(key) {
+      const agent = agents[key];
+      if (!agent) return;
+      document.getElementById('modal-title').textContent = `${agent.emoji} ${agent.name} DETAIL`;
+      const tokenData = agent.tokenHistory && agent.tokenHistory.length > 0 ? agent.tokenHistory : [10,25,18,30,45,60,55,70,65,80,75,90];
+      const sessionData = agent.tokenHistory && agent.tokenHistory.length > 0 ? agent.tokenHistory.map(t => Math.round(t * 0.8 + 10)) : [15,18,22,19,25,30,28,35,32,40,38,45];
+      const resourceData = agent.tokenHistory && agent.tokenHistory.length > 0 ? agent.tokenHistory.map(t => Math.round(t * 0.7 + 15)) : [30,45,40,60,50,70,65,80,75,90,85,95];
+      drawLineChart('chart-token', tokenData, '#00ffff');
+      drawLineChart('chart-session', sessionData, '#ff00ff');
+      drawLineChart('chart-resource', resourceData, '#ffaa00');
+      addLog('UI', `Opened detail for ${agent.name}`);
+      document.getElementById('agent-modal').classList.add('active');
+    }
+    function closeModal() { document.getElementById('agent-modal').classList.remove('active'); }
+    function drawLineChart(canvasId, data, color) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width = canvas.offsetWidth;
+      const h = canvas.height = canvas.offsetHeight;
+      ctx.clearRect(0,0,w,h);
+      ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.shadowColor = color; ctx.shadowBlur = 10;
+      ctx.beginPath();
+      const step = w / (data.length - 1);
+      data.forEach((val, i) => {
+        const x = i * step;
+        const y = h - (val / 100) * h;
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      ctx.lineTo(w, h); ctx.lineTo(0, h);
+      ctx.fillStyle = color.replace(')', ', 0.1)').replace('rgb', 'rgba');
+      ctx.fill();
+    }
     // Settings
     function openSettings() {
       document.getElementById('settings-modal').classList.add('active');
@@ -387,18 +406,12 @@
         if (saved.SOUND_ENABLED !== undefined) SOUND_ENABLED = saved.SOUND_ENABLED;
       } catch (e) {}
     }
-    
-    // Placeholder modal functions (existing modal HTML remains)
-    function openModal(key) { /* existing modal logic */ }
-    function closeModal() { document.getElementById('agent-modal').classList.remove('active'); }
-    
     // Clock
     function updateClock() {
       const now = new Date();
       document.getElementById('clock').textContent = now.toLocaleTimeString('zh-CN', { hour12: false });
       document.getElementById('date').textContent = now.toLocaleDateString('zh-CN');
     }
-    
     // Init
     function init() {
       loadSettings();
@@ -406,41 +419,10 @@
       updateClock();
       setInterval(updateClock, 1000);
       refreshTimer = setInterval(fetchStatus, REFRESH_INTERVAL * 1000);
+      setInterval(drawTopology, 5000);
+      drawTopology();
     }
-    
     window.onload = init;
   </script>
-
-  <!-- Settings Modal -->
-  <div class="modal" id="settings-modal">
-    <div class="modal-content" style="max-width:500px;">
-      <div class="modal-close" onclick="closeSettings()">&times;</div>
-      <div class="modal-header">
-        <div class="modal-title">⚙️ SETTINGS</div>
-        <button class="close-btn" onclick="closeSettings()">CLOSE</button>
-      </div>
-      <div class="modal-body" style="display:block;">
-        <div class="setting-row">
-          <label>
-            <span>ALERT THRESHOLD (%)</span>
-            <input type="number" id="alert-threshold" value="80" min="1" max="100">
-          </label>
-        </div>
-        <div class="setting-row">
-          <label>
-            <span>REFRESH INTERVAL (s)</span>
-            <input type="number" id="refresh-interval" value="10" min="3" max="60">
-          </label>
-        </div>
-        <div class="setting-row">
-          <label>
-            <span>ENABLE SOUND ALERTS</span>
-            <input type="checkbox" id="sound-alert">
-          </label>
-        </div>
-        <button class="close-btn" onclick="saveSettings()" style="width:100%;margin-top:10px;">SAVE</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
